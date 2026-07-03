@@ -3,6 +3,15 @@ const supabaseUrl = 'https://caffwjycgjomyejboyup.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhZmZ3anljZ2pvbXllamJveXVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzQ3MTIsImV4cCI6MjA5NzkxMDcxMn0.VKIL7Z_4qVw-8XI3Df6xRxK-AcssfifQ1gnoHHcVEWI';
 const clienteSupabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+// Al inicio de admin-dashboard.js
+async function verificarSesion() {
+    const { data: { session } } = await clienteSupabase.auth.getSession();
+    if (!session) {
+        window.location.href = 'admin-login.html'; // Si no hay sesión, al login
+    }
+}
+verificarSesion();
+
 // 2. Escuchamos cuando la clienta le da clic a "Guardar Producto"
 document.getElementById('form-producto').addEventListener('submit', async function(evento) {
     // Evitamos que la página recargue bruscamente

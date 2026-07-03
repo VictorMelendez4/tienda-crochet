@@ -79,21 +79,24 @@
                     "container-margin": "24px"
             },
             "fontFamily": {
-                    "body-md": ["Inter"],
-                    "display": ["Montserrat"],
-                    "label-sm": ["Inter"],
-                    "body-lg": ["Inter"],
-                    "headline-lg": ["Montserrat"],
-                    "label-lg": ["Inter"],
-                    "headline-md": ["Montserrat"]
+                    "body-md": ["Inter", "sans-serif"],
+                    "display": ["Montserrat", "sans-serif"],
+                    "label-sm": ["Inter", "sans-serif"],
+                    "body-lg": ["Inter", "sans-serif"],
+                    "headline-lg": ["Montserrat", "sans-serif"],
+                    "label-lg": ["Inter", "sans-serif"],
+                    "headline-md": ["Montserrat", "sans-serif"]
             }
           }
         }
       }
     </script>
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
         body {
-            background-color: #F5F5DC; /* Warm Minimalism Beige Base */
+            background-color: #F5F5DC; 
         }
         .soft-shadow {
             box-shadow: 0 10px 30px rgba(124, 85, 68, 0.08);
@@ -101,10 +104,9 @@
         .squish-click:active {
             transform: scale(0.98);
         }
-        /* Estilos del Botón Flotante de WhatsApp */
         #btn-whatsapp {
             position: fixed;
-            bottom: 90px; /* Levantado un poco para no tapar la barra inferior en celular */
+            bottom: 90px; 
             right: 30px;
             background-color: #25D366;
             color: white;
@@ -134,16 +136,17 @@
             </div>
             <nav class="hidden md:flex gap-8 items-center font-label-lg text-label-lg">
                 <a class="text-primary border-b-2 border-primary pb-1 squish-click" href="#">Home</a>
-                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click" href="#">Browse</a>
-                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click" href="#">Custom Orders</a>
-                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click" href="#">About</a>
+                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click" href="#catalogo">Browse</a>
+                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click" href="custom-orders.html">Custom Orders</a>
+                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click" href="about.html">About</a>
             </nav>
             <div class="flex items-center gap-4">
                 <button class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click">
                     <span class="material-symbols-outlined" data-icon="search">search</span>
                 </button>
-                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-active" href="cart.html">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
+                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click flex items-center" href="cart.html">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
+                    <span id="contador-carrito" class="ml-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
                 </a>
             </div>
         </div>
@@ -152,75 +155,32 @@
     <main class="pt-24 max-w-7xl mx-auto px-container-margin">
         <section class="mt-stack-lg mb-section-gap">
             <div class="relative bg-surface-container-lowest rounded-2xl overflow-hidden soft-shadow group">
-                <div class="w-full h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat" data-alt="A wide hero banner showing a beautifully crafted amigurumi teddy bear" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDEotIolos2f563mi_Av_imfHCIa8nbz4_7GdkWZs2SirtyIdrmysE9YJUDgV_IwTIPTlFkAj4y0nUJ86zB9aZfB1wUnhxQx5y9lhafvsvMmzpbQrwukRdOdS-E2KV0kXrk-avaJEYKvuNjddhRvxnGtQ1VKiQDxqBPfM3fKRLIUD04UKo9vEHbi5IXD9Tsvw5VDFKPzOuqm7xPzrZjNiLDfmwTPli3z7VE1M99O9HZNLMOcd1ZkNiaP-AolbTC-rWtvfB9F1Fjoig1');"></div>
-                <div class="absolute inset-0 bg-gradient-to-r from-surface/90 via-surface/50 to-transparent flex items-center">
+                <div class="w-full h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1628148810757-0a9f5dceafbc?q=80&w=2000&auto=format&fit=crop');"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-[#fbfbe2]/95 via-[#fbfbe2]/70 to-transparent flex items-center">
                     <div class="max-w-xl pl-8 md:pl-16">
-                        <h1 class="font-display text-display text-primary mb-stack-sm">Handcrafted Companions</h1>
-                        <p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg max-w-md">Bring home a touch of warmth with our artisanal amigurumi plushies, stitched with love and high-quality yarn.</p>
-                        <button class="bg-primary text-on-primary font-label-lg text-label-lg px-8 py-3 rounded-full soft-shadow hover:opacity-90 squish-click transition-all">Shop Now</button>
+                        <h1 class="font-display text-[40px] leading-tight font-bold text-primary mb-stack-sm">Handcrafted Companions</h1>
+                        <p class="font-body-lg text-lg text-on-surface-variant mb-stack-lg max-w-md">Bring home a touch of warmth with our artisanal amigurumi plushies, stitched with love and high-quality yarn.</p>
+                        <button onclick="document.getElementById('catalogo').scrollIntoView()" class="bg-primary text-on-primary font-label-lg font-bold px-8 py-3.5 rounded-full soft-shadow hover:opacity-90 squish-click transition-all">Shop Now</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="mb-section-gap">
+        <section id="catalogo" class="mb-section-gap scroll-mt-28">
             <div class="flex justify-between items-end mb-stack-md">
-                <h2 class="font-headline-lg text-headline-lg text-on-surface">Browse by Collection</h2>
-                <a class="text-primary font-label-lg text-label-lg hover:underline squish-click" href="#">View All</a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-                <a class="block relative h-64 rounded-2xl overflow-hidden soft-shadow group squish-click transition-transform" href="#">
-                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Farm animals" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCds0WMPoYlAfwfvPvxTnFpF4YU_iMUt6waUojdpCM0-H8m4QnF6dA7rxsM-VGGpLigekJF9yKF8mAz3SvH5N6ZYy4KPWkgU04ecTDRch7mZeXFEX4NnM7Zo_HI2kd5sKB4pKTEsZoQtIW3fzaeY4xaScPbDNpiUD5w-d4GH0cJhuIDNjUfMoqBUwACo34x-Nhgb3iWp7d85CFXLz1FuSqdeJ3QajkNB03FMpeuJ-AdDtLPdbbHI5_KE8O6kTMZm3gXY1GTWwXpGo-7');"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                        <h3 class="font-headline-md text-headline-md text-white">Farm Animals</h3>
-                    </div>
-                </a>
-                <a class="block relative h-64 rounded-2xl overflow-hidden soft-shadow group squish-click transition-transform" href="#">
-                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Ocean friends" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDYWIakFI-PDfWlmek_Srn5YwuUz1y9sSdT7vKR-Jec-S2ULeuU88Qxm3vIFUhMbdjXvdRtMFaXx8D1_2n7SLVtEv6p1S_P-AEZj_th2IXitlcUPjnorkEp9r5PpIHNqSxiCMKXgSHgtb6kFSR4-w2LdxBSUJgmrmDoFh51Mz8YN1cNEmtFnT0DhetYJ_5qRWd1R9HsA0oLNZ4ddsBIDXy_emhndlKATfw_K38VXnV0BVzdtENogfpyONL73pcJZW4tYnalS6G6Jjfi');"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                        <h3 class="font-headline-md text-headline-md text-white">Ocean Friends</h3>
-                    </div>
-                </a>
-                <a class="block relative h-64 rounded-2xl overflow-hidden soft-shadow group squish-click transition-transform" href="#">
-                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Forest creatures" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBTfvT0kbO7VVETyGVfqo-8ylRocycO6DDlOhy-OLRc8TDSJCTEBwyZAIxIxCIlftMa4D-7IlDQVz5lEhXjouDmA3lemSCL0SJjnQLJyuUepqAnkBGyoMmHCjKVHoqfg-dwUrQpre3IxByGFfs7894tNehf6nu3-M3ybZ49U28ASUOHVnOjH3XPRO4i5eZskCx7I72NNcPew_XEzJ_A1OPD3eWJO4RiqLY6zgf0-yMhc4P9bVXAiqOWD3TYbFumupnquqGuFSWfcCKu');"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                        <h3 class="font-headline-md text-headline-md text-white">Forest Creatures</h3>
-                    </div>
-                </a>
-            </div>
-        </section>
-
-        <section class="mb-section-gap">
-            <div class="flex justify-between items-end mb-stack-md">
-                <h2 class="font-headline-lg text-headline-lg text-on-surface">New Arrivals</h2>
+                <h2 class="font-headline-lg text-2xl font-bold text-on-surface">New Arrivals</h2>
             </div>
             
-            <div id="contenedor-productos" class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
-                <p class="col-span-2 md:col-span-4 text-center py-10 font-body-lg text-on-surface-variant">Cargando catálogo...</p>
+            <div id="contenedor-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+                <p class="col-span-full text-center py-10 font-body-lg text-on-surface-variant">
+                    <span class="material-symbols-outlined animate-spin text-primary text-3xl mb-2">sync</span>
+                    <br>Cargando colección mágica...
+                </p>
             </div>
         </section>
     </main>
 
-    <nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-container-margin pb-6 pt-2 bg-surface/80 backdrop-blur-lg shadow-[0_-4px_20px_0px_rgba(124,85,68,0.08)] rounded-t-xl z-50">
-        <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 squish-click transition-all duration-300 ease-out" href="#">
-            <span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
-            <span class="font-label-sm text-label-sm mt-1">Home</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-full squish-click transition-colors" href="#">
-            <span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
-            <span class="font-label-sm text-label-sm mt-1">Browse</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-full squish-click transition-colors" href="#">
-            <span class="material-symbols-outlined" data-icon="favorite">favorite</span>
-            <span class="font-label-sm text-label-sm mt-1">Saved</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-full squish-click transition-colors" href="#">
-            <span class="material-symbols-outlined" data-icon="person">person</span>
-            <span class="font-label-sm text-label-sm mt-1">Me</span>
-        </a>
-    </nav>
-
-    <button id="btn-whatsapp" onclick="window.location.href='cart.html'">🛒 Ver Carrito</button>
+    <button id="btn-whatsapp" onclick="window.location.href='cart.html'" class="flex items-center gap-2">🛒 Ver Carrito</button>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>

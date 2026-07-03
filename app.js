@@ -1,85 +1,74 @@
-// 1. Configuración de conexión (Tus llaves van aquí)
+// 1. Conexión a Supabase (Usamos la misma de tu admin)
 const supabaseUrl = 'https://caffwjycgjomyejboyup.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhZmZ3anljZ2pvbXllamJveXVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzQ3MTIsImV4cCI6MjA5NzkxMDcxMn0.VKIL7Z_4qVw-8XI3Df6xRxK-AcssfifQ1gnoHHcVEWI';
-const clienteSupabase = supabase.createClient(supabaseUrl, supabaseKey);
+const clienteSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// --- LÓGICA DEL CARRITO ---
-let carrito = JSON.parse(localStorage.getItem('carrito-crochet')) || [];
-
-function agregarAlCarrito(id, nombre, precio) {
-    carrito.push({ id, nombre, precio });
-    localStorage.setItem('carrito-crochet', JSON.stringify(carrito));
-    alert(`¡Agregaste: ${nombre} al carrito!`);
-}
-
-function enviarPedidoWhatsApp() {
-    if (carrito.length === 0) {
-        alert("Tu carrito está vacío. ¡Agrega algunos tejidos primero!");
-        return;
-    }
-
-    // Usamos %0A en lugar de \n para que WhatsApp respete los saltos de línea
-    let textoPedido = "Hola, me interesa hacer el siguiente pedido:%0A%0A";
-    let total = 0;
-
-    carrito.forEach(item => {
-        textoPedido += `- ${item.nombre} ($${item.precio})%0A`;
-        total += item.precio;
-    });
-
-    textoPedido += `%0ATotal: $${total} MXN%0A%0A¿Me pasas tu número de cuenta para depositar?`;
-
-    const numeroWhatsApp = "528710000000"; // Pon el número real aquí
-    const url = `https://wa.me/${numeroWhatsApp}?text=${textoPedido}`;
-    window.open(url, '_blank');
-}
-
-// --- LÓGICA DE RENDERIZADO CON DISEÑO YARNLY ---
-async function obtenerProductos() {
-    let { data: productos, error } = await clienteSupabase
-        .from('productos')
-        .select('*');
-
-    if (error) {
-        console.error("Hubo un error conectando:", error);
-        document.getElementById('contenedor-productos').innerText = "Error al cargar el catálogo.";
-        return;
-    }
-
+// 2. Traer el catálogo de Supabase
+async function cargarCatalogoPublico() {
     const contenedor = document.getElementById('contenedor-productos');
-    contenedor.innerHTML = ''; 
 
-    productos.forEach(producto => {
-        if (producto.disponible) {
-            // ENVOLVEMOS TODA LA TARJETA EN UN ENLACE HACIA EL DETALLE
-            const tarjetaHTML = `
-            <a href="detalle.html?id=${producto.id}" class="block group">
-                <div class="bg-surface-container-lowest rounded-2xl overflow-hidden soft-shadow flex flex-col squish-click transition-transform">
-                    <div class="relative p-1">
-                        <div class="w-full h-48 md:h-56 bg-surface-container rounded-t-xl overflow-hidden">
-                            <img alt="${producto.nombre}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="${producto.imagen_url}" />
-                        </div>
-                        <button class="absolute top-3 right-3 w-8 h-8 bg-surface-container-lowest/80 backdrop-blur text-primary rounded-full flex items-center justify-center hover:bg-primary-container transition-colors">
-                            <span class="material-symbols-outlined text-[18px]" data-icon="favorite_border">favorite_border</span>
-                        </button>
-                    </div>
-                    <div class="p-4 flex flex-col flex-grow">
-                        <h3 class="font-body-lg text-body-lg font-medium text-on-surface mb-1">${producto.nombre}</h3>
-                        <p class="font-label-sm text-label-sm text-on-surface-variant mb-3 flex-grow truncate">${producto.descripcion}</p>
-                        <div class="flex justify-between items-center mt-auto">
-                            <span class="font-label-lg text-label-lg text-primary">$${producto.precio} MXN</span>
-                            <button class="w-8 h-8 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center hover:bg-primary transition-colors hover:text-on-primary" 
-                                    onclick="event.preventDefault(); agregarAlCarrito(${producto.id}, '${producto.nombre}', ${producto.precio})">
-                                <span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
-                            </button>
-                        </div>
-                    </div>
+    try {
+        // Pedimos los productos ordenados por los más nuevos y que tengan stock
+        const { data: productos, error } = await clienteSupabase
+            .from('productos')
+            .select('*')
+            .gt('stock', 0) 
+            .order('id', { ascending: false });
+
+        if (error) throw error;
+
+        renderizarProductos(productos);
+    } catch (error) {
+        console.error("Error al cargar productos:", error);
+        contenedor.innerHTML = `
+            <div class="col-span-full text-center py-12 bg-error-container rounded-2xl">
+                <span class="material-symbols-outlined text-error text-4xl mb-2">error</span>
+                <p class="text-error font-body-lg">Lo sentimos, no pudimos cargar el catálogo en este momento.</p>
+            </div>`;
+    }
+}
+
+// 3. Dibujar las tarjetas usando TUS colores de Tailwind
+function renderizarProductos(productos) {
+    const contenedor = document.getElementById('contenedor-productos');
+    contenedor.innerHTML = ''; // Limpiamos el "Cargando..."
+
+    if (productos.length === 0) {
+        contenedor.innerHTML = '<p class="col-span-full text-center py-10 font-body-lg text-on-surface-variant">Próximamente nuevos diseños disponibles.</p>';
+        return;
+    }
+
+    productos.forEach(prod => {
+        contenedor.innerHTML += `
+        <article class="bg-surface-container-lowest rounded-2xl overflow-hidden soft-shadow group flex flex-col hover:-translate-y-1 transition-transform duration-300">
+            <div class="relative h-56 overflow-hidden bg-white">
+                <img src="${prod.imagen_url}" alt="${prod.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                <span class="absolute top-3 left-3 bg-surface/90 backdrop-blur-md px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-primary shadow-sm">
+                    ${prod.categoria || 'Nuevo'}
+                </span>
+            </div>
+            
+            <div class="p-5 flex flex-col flex-grow">
+                <h3 class="font-headline-md text-lg text-on-surface font-bold leading-tight mb-1 truncate" title="${prod.nombre}">${prod.nombre}</h3>
+                
+                <div class="mt-auto pt-3">
+                    <p class="font-body-lg text-primary font-bold text-xl mb-4">$${prod.precio.toFixed(2)} <span class="text-xs text-on-surface-variant font-normal">MXN</span></p>
+                    
+                    <button onclick="agregarAlCarrito(${prod.id}, '${prod.nombre.replace(/'/g, "\\'")}', ${prod.precio})" class="w-full bg-primary text-on-primary font-label-lg text-sm px-4 py-2.5 rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2 squish-click shadow-sm">
+                        <span class="material-symbols-outlined text-base">shopping_bag</span>
+                        Add to Cart
+                    </button>
                 </div>
-            </a>
-            `;
-            contenedor.innerHTML += tarjetaHTML;
-        }
+            </div>
+        </article>`;
     });
 }
 
-obtenerProductos();
+// 4. Lógica básica del carrito (para que no de error el botón por ahora)
+window.agregarAlCarrito = function(id, nombre, precio) {
+    // Aquí después programaremos el guardado en localStorage
+    alert(`¡${nombre} añadido al carrito por $${precio}!`);
+}
+
+// 5. ¡Arrancamos motores!
+cargarCatalogoPublico();
