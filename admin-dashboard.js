@@ -524,8 +524,151 @@ window.cerrarModalCategorias = function() {
     setTimeout(() => modal.classList.add('hidden'), 300);
 }
 
+// --- GESTIÓN DE PEDIDOS ---
+let pedidosGlobales = [];
+let filtroEstadoActual = 'todos';
+
+const ESTILOS_ESTADO = {
+    pendiente:  'bg-amber-50 text-amber-700 border-amber-200',
+    confirmado: 'bg-blue-50 text-blue-700 border-blue-200',
+    enviado:    'bg-emerald-50 text-emerald-700 border-emerald-200',
+    cancelado:  'bg-red-50 text-red-600 border-red-200'
+};
+
+async function cargarPedidos() {
+    const { data: pedidos, error } = await clienteSupabase
+        .from('pedidos')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error al cargar pedidos:", error);
+        return;
+    }
+
+    pedidosGlobales = pedidos || [];
+    actualizarBadgePedidos();
+    renderizarPedidos();
+}
+
+function actualizarBadgePedidos() {
+    const pendientes = pedidosGlobales.filter(p => p.estado === 'pendiente').length;
+    const badge = document.getElementById('badge-pedidos-pendientes');
+    if (badge) {
+        badge.innerText = pendientes;
+        badge.classList.toggle('hidden', pendientes === 0);
+    }
+}
+
+function renderizarPedidos() {
+    const lista = document.getElementById('lista-pedidos');
+    if (!lista) return;
+
+    const pedidosFiltrados = filtroEstadoActual === 'todos'
+        ? pedidosGlobales
+        : pedidosGlobales.filter(p => p.estado === filtroEstadoActual);
+
+    if (pedidosFiltrados.length === 0) {
+        lista.innerHTML = `<p class="text-center text-gray-400 py-10 text-sm">No hay pedidos en esta categoría.</p>`;
+        return;
+    }
+
+    lista.innerHTML = pedidosFiltrados.map(pedido => {
+        const fecha = new Date(pedido.created_at).toLocaleString('es-MX', {
+            day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        const itemsHtml = (pedido.items || []).map(item => {
+            const cantidad = item.cantidad || 1;
+            return `<li class="flex justify-between text-sm text-gray-600 py-1">
+                        <span>${item.nombre} <span class="text-gray-400">x${cantidad}</span></span>
+                        <span class="font-medium">$${(item.precio * cantidad).toFixed(2)}</span>
+                    </li>`;
+        }).join('');
+
+        const estiloBadge = ESTILOS_ESTADO[pedido.estado] || ESTILOS_ESTADO.pendiente;
+
+        return `
+        <div class="bg-white p-6 rounded-2xl border border-[#EFEFD7]/50 shadow-[0_4px_20px_rgba(27,29,14,0.02)]">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <p class="font-bold text-[#1B1D0E]">Pedido #${pedido.id}</p>
+                    <p class="text-xs text-gray-400">${fecha}</p>
+                </div>
+                <span class="text-xs font-bold px-3 py-1 rounded-full border ${estiloBadge} capitalize">${pedido.estado}</span>
+            </div>
+
+            <ul class="border-t border-b border-gray-100 py-2 mb-4 divide-y divide-gray-50">
+                ${itemsHtml}
+            </ul>
+
+            <div class="flex justify-between items-center">
+                <p class="font-bold text-lg text-[#1B1D0E]">Total: $${Number(pedido.total).toFixed(2)} MXN</p>
+                <select onchange="actualizarEstadoPedido(${pedido.id}, this.value)" class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-[#FAF9F5] focus:outline-none focus:border-[#7C5544] cursor-pointer">
+                    <option value="pendiente" ${pedido.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                    <option value="confirmado" ${pedido.estado === 'confirmado' ? 'selected' : ''}>Confirmado</option>
+                    <option value="enviado" ${pedido.estado === 'enviado' ? 'selected' : ''}>Enviado</option>
+                    <option value="cancelado" ${pedido.estado === 'cancelado' ? 'selected' : ''}>Cancelado</option>
+                </select>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+window.filtrarPedidos = function(estado) {
+    filtroEstadoActual = estado;
+    document.querySelectorAll('.filtro-pedido').forEach(btn => {
+        const activo = btn.dataset.estado === estado;
+        btn.classList.toggle('bg-[#1B1D0E]', activo);
+        btn.classList.toggle('text-white', activo);
+        btn.classList.toggle('bg-white', !activo);
+        btn.classList.toggle('border', !activo);
+        btn.classList.toggle('border-gray-200', !activo);
+        btn.classList.toggle('text-gray-500', !activo);
+    });
+    renderizarPedidos();
+}
+
+window.actualizarEstadoPedido = async function(id, nuevoEstado) {
+    const { error } = await clienteSupabase
+        .from('pedidos')
+        .update({ estado: nuevoEstado })
+        .eq('id', id);
+
+    if (error) {
+        alert("No se pudo actualizar el estado. Revisa la consola.");
+        console.error(error);
+        return;
+    }
+    cargarPedidos();
+}
+
+// --- CAMBIO ENTRE PESTAÑAS ---
+window.cambiarVista = function(vista) {
+    const vistaInventario = document.getElementById('vista-inventario');
+    const vistaPedidos = document.getElementById('vista-pedidos');
+    const tabInventario = document.getElementById('tab-inventario');
+    const tabPedidos = document.getElementById('tab-pedidos');
+
+    if (vista === 'pedidos') {
+        vistaInventario.classList.add('hidden');
+        vistaPedidos.classList.remove('hidden');
+        tabPedidos.classList.add('border-[#7C5544]', 'text-[#7C5544]');
+        tabPedidos.classList.remove('border-transparent', 'text-gray-400');
+        tabInventario.classList.remove('border-[#7C5544]', 'text-[#7C5544]');
+        tabInventario.classList.add('border-transparent', 'text-gray-400');
+    } else {
+        vistaPedidos.classList.add('hidden');
+        vistaInventario.classList.remove('hidden');
+        tabInventario.classList.add('border-[#7C5544]', 'text-[#7C5544]');
+        tabInventario.classList.remove('border-transparent', 'text-gray-400');
+        tabPedidos.classList.remove('border-[#7C5544]', 'text-[#7C5544]');
+        tabPedidos.classList.add('border-transparent', 'text-gray-400');
+    }
+}
+
+
 // Inicializar la carga al abrir el panel
 cargarCategorias();
-
-// Inicialización de la consola al cargar el DOM
 cargarInventario();
+cargarPedidos();

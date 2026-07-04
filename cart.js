@@ -1,3 +1,4 @@
+import { clienteSupabase } from './supabase.js';
 // 1. Cargamos el carrito desde el almacenamiento del navegador
 let carrito = JSON.parse(localStorage.getItem('carrito-crochet')) || [];
 
@@ -56,38 +57,71 @@ carrito.forEach((item, index) => {
 }
 
 // 4. Función para eliminar un producto
-function eliminarProducto(index) {
+window.eliminarProducto = function(index) {
     carrito.splice(index, 1);
     localStorage.setItem('carrito-crochet', JSON.stringify(carrito));
     renderizarCarrito();
 }
 
 // 5. Función de Checkout: Conexión con WhatsApp
-function enviarPedidoWhatsApp() {
+window.enviarPedidoWhatsApp = async function() {
     if (carrito.length === 0) {
         alert("Tu carrito está vacío.");
         return;
     }
 
-    let textoPedido = "Hola, me interesa hacer el siguiente pedido:%0A%0A";
+    const btnCheckout = document.querySelector('[onclick="enviarPedidoWhatsApp()"]');
+    if (btnCheckout) {
+        btnCheckout.disabled = true;
+        btnCheckout.innerText = "Guardando pedido...";
+    }
+
     let total = 0;
+    carrito.forEach(item => {
+        const cantidad = item.cantidad || 1;
+        total += item.precio * cantidad;
+    });
+
+    // 1. Guardamos el pedido en Supabase antes que nada
+    const { data: pedidoGuardado, error } = await clienteSupabase
+        .from('pedidos')
+        .insert([{ items: carrito, total: total, estado: 'pendiente' }])
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Error al guardar el pedido:", error);
+        alert("Hubo un problema al registrar tu pedido. Por favor intenta de nuevo o contáctanos directamente.");
+        if (btnCheckout) {
+            btnCheckout.disabled = false;
+            btnCheckout.innerText = "Checkout →";
+        }
+        return;
+    }
+
+    // 2. Armamos el mensaje de WhatsApp, incluyendo el número de pedido
+    let textoPedido = `Hola, quiero confirmar mi pedido #${pedidoGuardado.id}:%0A%0A`;
 
     carrito.forEach(item => {
-    const cantidad = item.cantidad || 1;
-    textoPedido += `- ${item.nombre} (x${cantidad}): $${item.precio * cantidad} MXN%0A`;
-    total += (item.precio * cantidad);
-});
+        const cantidad = item.cantidad || 1;
+        textoPedido += `- ${item.nombre} (x${cantidad}): $${item.precio * cantidad} MXN%0A`;
+    });
 
     textoPedido += `%0ATotal: $${total} MXN%0A%0A¿Me pasas tu número de cuenta para depositar?`;
 
     // Cambia este número por el de la clienta (formato MX: 521XXXXXXXXXX)
-    const numeroWhatsApp = "528710000000"; 
+    const numeroWhatsApp = "528710000000";
     const url = `https://wa.me/${numeroWhatsApp}?text=${textoPedido}`;
-    
+
+    // 3. Vaciamos el carrito, ya quedó registrado el pedido
+    localStorage.removeItem('carrito-crochet');
+    carrito = [];
+    renderizarCarrito();
+
     window.open(url, '_blank');
 }
 
-function cambiarCantidad(index, delta) {
+window.cambiarCantidad = function(index, delta) {
     if (!carrito[index].cantidad) carrito[index].cantidad = 1;
     
     carrito[index].cantidad += delta;

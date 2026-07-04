@@ -68,7 +68,17 @@
             </div>
         </section>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <div class="flex gap-2 mb-8 border-b border-[#EFEFD7]/60">
+            <button id="tab-inventario" onclick="cambiarVista('inventario')" class="px-5 py-3 text-sm font-semibold border-b-2 border-[#7C5544] text-[#7C5544] transition-colors">
+                Inventario
+            </button>
+            <button id="tab-pedidos" onclick="cambiarVista('pedidos')" class="px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-[#7C5544] transition-colors flex items-center gap-2">
+                Pedidos
+                <span id="badge-pedidos-pendientes" class="hidden bg-[#7C5544] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
+        </div>
+
+        <div id="vista-inventario" class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             <aside class="lg:col-span-4 bg-white p-6 rounded-2xl border border-[#EFEFD7]/50 shadow-[0_4px_20px_rgba(27,29,14,0.02)]">
                 <h2 class="text-xl font-medium mb-6 text-[#1B1D0E]">Nuevo Diseño</h2>
                 <form id="form-crear" class="space-y-5">
@@ -124,6 +134,18 @@
                 <div id="lista-inventario" class="grid grid-cols-1 gap-4"></div>
             </section>
         </div>
+
+        <section id="vista-pedidos" class="hidden">
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button onclick="filtrarPedidos('todos')" data-estado="todos" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-[#1B1D0E] text-white transition-colors">Todos</button>
+                <button onclick="filtrarPedidos('pendiente')" data-estado="pendiente" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Pendientes</button>
+                <button onclick="filtrarPedidos('confirmado')" data-estado="confirmado" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Confirmados</button>
+                <button onclick="filtrarPedidos('enviado')" data-estado="enviado" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Enviados</button>
+                <button onclick="filtrarPedidos('cancelado')" data-estado="cancelado" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Cancelados</button>
+            </div>
+            <div id="lista-pedidos" class="grid grid-cols-1 gap-4"></div>
+        </section>
+
     </main>
 
     <div id="modal-edicion" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-[#1B1D0E]/40 backdrop-blur-sm opacity-0 transition-opacity duration-300">
