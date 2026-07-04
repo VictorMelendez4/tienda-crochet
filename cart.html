@@ -4,27 +4,10 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Shopping Cart</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="tailwind.css">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     
-    <script id="tailwind-config">
-        tailwind.config = {
-          theme: {
-            extend: {
-              colors: {
-                "surface-container-low": "#f5f5dc",
-                "on-surface": "#1b1d0e",
-                "on-surface-variant": "#51443f",
-                "primary": "#7c5544",
-                "primary-container": "#ffcbb5",
-                "surface-container-lowest": "#ffffff",
-                "outline-variant": "#d5c3bc",
-                "error": "#ba1a1a"
-              }
-            }
-          }
-        }
-    </script>
+    
     <style>
         .shadow-ambient { box-shadow: 0 10px 30px -5px rgba(124, 85, 68, 0.08); }
         .squish-active:active { transform: scale(0.98); }
@@ -67,7 +50,7 @@
             </div>
         </div>
     </main>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="cart.js"></script>
 </body>
 </html>

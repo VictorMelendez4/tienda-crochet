@@ -1,54 +1,126 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle del Producto</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <title>Detalle del Producto — Crochet Catalog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="tailwind.css">
+    
     <style>
-        /* Agregamos los estilos faltantes que no son de Tailwind */
-        .soft-shadow { box-shadow: 0 8px 30px rgba(124, 85, 68, 0.08); }
-        .squish { transition: transform 0.2s ease; }
-        .squish:active { transform: scale(0.98); }
+        html { scroll-behavior: smooth; }
+        .soft-shadow { box-shadow: 0 10px 30px rgba(124, 85, 68, 0.08); }
+        .squish-click:active { transform: scale(0.98); }
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] .chevron { transform: rotate(180deg); }
     </style>
 </head>
-<body class="bg-[#F5F5DC] text-[#1B1D0E] font-sans min-h-screen pt-10">
+<body class="font-body bg-background text-on-surface antialiased pb-24 md:pb-0">
 
-    <main class="max-w-[1200px] mx-auto px-6 py-12">
-    <nav class="flex items-center gap-2 text-sm font-medium mb-8">
-        <a href="index.html" class="inline-flex items-center gap-1.5 text-gray-500 hover:text-[#7c5544] transition-all duration-200 mb-8 font-medium">
-            <span class="material-symbols-outlined text-lg">arrow_back</span>
-            Volver al catálogo
-        </a>
-        <span id="nombre-producto-breadcrumb" class="hidden"></span>
-    </nav>
-
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div class="w-full aspect-square bg-[#EFEFD7] rounded-3xl shadow-ambient p-3 flex items-center justify-center border border-white/50">
-            <img id="img-principal" src="" alt="Producto" class="w-full h-full object-cover rounded-2xl">
+    <header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-md shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
+            <div class="flex items-center gap-6">
+                <button class="md:hidden text-on-surface-variant hover:opacity-80 transition-opacity">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <a class="font-display text-2xl font-bold text-primary" href="index.html">Crochet Catalog</a>
+            </div>
+            <nav class="hidden md:flex gap-8 items-center text-sm font-medium">
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html#catalogo">Browse</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="custom-orders.html">Custom Orders</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="about.html">About</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <a class="text-on-surface-variant hover:opacity-80 transition-opacity flex items-center" href="cart.html">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
+                    <span id="contador-carrito" class="ml-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
+                </a>
+            </div>
         </div>
+    </header>
 
-            <div class="flex flex-col justify-center py-4">
-                <h1 id="titulo-producto" class="text-5xl font-extrabold text-[#1b1d0e] mb-4 tracking-tight">Cargando...</h1>
-            <div id="precio-producto" class="text-3xl font-bold text-[#7c5544] mb-8">$0.00</div>
-    
-            <div class="space-y-4 mb-10">
-                <h3 class="font-bold text-lg text-gray-800">Descripción</h3>
-                <p id="desc-producto" class="text-gray-600 leading-relaxed text-lg italic">
-                    Cargando descripción...
-                </p>
+    <main class="max-w-[1200px] mx-auto px-6 pt-28 pb-16">
+        <nav class="flex items-center gap-2 text-sm font-medium text-on-surface-variant mb-8">
+            <a href="index.html" class="hover:text-primary transition-colors">Catálogo</a>
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span id="categoria-breadcrumb">...</span>
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span id="nombre-producto-breadcrumb" class="text-on-surface font-semibold truncate max-w-[200px]">Cargando...</span>
+        </nav>
+
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-14">
+            <div>
+                <div class="w-full aspect-square bg-surface-container rounded-2xl soft-shadow p-3 flex items-center justify-center border border-white/50 relative overflow-hidden">
+                    <span id="categoria-badge" class="absolute top-5 left-5 bg-surface/90 backdrop-blur-md px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-primary shadow-sm z-10"></span>
+                    <img id="img-principal" src="" alt="Producto" class="w-full h-full object-cover rounded-xl">
+                </div>
+                <div id="galeria-thumbs" class="flex gap-3 mt-4"></div>
             </div>
 
-                <button id="btn-add-cart" class="group w-full max-w-[300px] bg-[#7c5544] text-white py-5 rounded-full font-bold text-lg shadow-xl hover:bg-orange-900 hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-2">
+            <div class="flex flex-col justify-center py-2">
+                <h1 id="titulo-producto" class="font-display text-4xl font-bold text-on-surface mb-3 tracking-tight">Cargando...</h1>
+                <div class="flex items-center gap-3 mb-6">
+                    <span id="precio-producto" class="text-2xl font-bold text-primary">$0.00 MXN</span>
+                    <span id="stock-badge" class="text-xs font-bold px-2.5 py-1 rounded-full"></span>
+                </div>
+
+                <p id="desc-producto" class="text-on-surface-variant leading-relaxed mb-8">Cargando descripción...</p>
+
+                <div class="flex items-center gap-4 mb-6">
+                    <span class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">Cantidad</span>
+                    <div class="flex items-center gap-1 bg-surface-container rounded-full px-1">
+                        <button type="button" onclick="cambiarCantidadDetalle(-1)" class="w-9 h-9 flex items-center justify-center hover:bg-surface-container-high rounded-full text-lg font-bold">–</button>
+                        <span id="cantidad-detalle" class="font-bold w-8 text-center">1</span>
+                        <button type="button" onclick="cambiarCantidadDetalle(1)" class="w-9 h-9 flex items-center justify-center hover:bg-surface-container-high rounded-full text-lg font-bold">+</button>
+                    </div>
+                </div>
+
+                <button id="btn-add-cart" class="group w-full max-w-[340px] bg-primary text-on-primary py-4 rounded-full font-bold text-base shadow-lg hover:opacity-90 transition-all duration-300 flex items-center justify-center gap-2 squish-click">
                     <span>Add to Cart</span>
                     <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">shopping_bag</span>
                 </button>
+
+                <div class="flex items-center gap-6 mt-8 pt-6 border-t border-outline-variant/40 text-xs text-on-surface-variant">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-lg">volunteer_activism</span>
+                        Tejido a mano
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-lg">chat</span>
+                        Coordinamos por WhatsApp
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-lg">verified</span>
+                        Pieza única
+                    </div>
+                </div>
+
+                <svg class="w-full h-6 my-8 text-outline-variant" viewBox="0 0 400 24" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                    <path d="M0 12 Q 10 2, 20 12 T 40 12 T 60 12 T 80 12 T 100 12 T 120 12 T 140 12 T 160 12 T 180 12 T 200 12 T 220 12 T 240 12 T 260 12 T 280 12 T 300 12 T 320 12 T 340 12 T 360 12 T 380 12 T 400 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+
+                <details class="group border-b border-outline-variant/40 py-4">
+                    <summary class="flex items-center justify-between font-bold text-sm">
+                        Cuidados del tejido
+                        <span class="material-symbols-outlined chevron transition-transform text-on-surface-variant">expand_more</span>
+                    </summary>
+                    <p class="text-sm text-on-surface-variant mt-3 leading-relaxed">Lavar a mano con agua fría y jabón neutro. Secar en superficie plana, lejos del sol directo, para que la fibra conserve su forma.</p>
+                </details>
+                <details class="group border-b border-outline-variant/40 py-4">
+                    <summary class="flex items-center justify-between font-bold text-sm">
+                        Envío y pago
+                        <span class="material-symbols-outlined chevron transition-transform text-on-surface-variant">expand_more</span>
+                    </summary>
+                    <p class="text-sm text-on-surface-variant mt-3 leading-relaxed">Al finalizar tu compra te contactamos por WhatsApp para confirmar el pedido, acordar el envío y compartirte los datos para tu pago.</p>
+                </details>
             </div>
         </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="detalle.js"></script>
+    <script type="module" src="detalle.js"></script>
 </body>
 </html>

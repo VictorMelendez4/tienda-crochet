@@ -1,5 +1,3 @@
-// --- Lógica del Carrito ---
-
 // 1. Cargamos el carrito desde el almacenamiento del navegador
 let carrito = JSON.parse(localStorage.getItem('carrito-crochet')) || [];
 

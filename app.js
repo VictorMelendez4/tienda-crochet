@@ -1,7 +1,4 @@
-// 1. Conexión a Supabase (Usamos la misma de tu admin)
-const supabaseUrl = 'https://caffwjycgjomyejboyup.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhZmZ3anljZ2pvbXllamJveXVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzQ3MTIsImV4cCI6MjA5NzkxMDcxMn0.VKIL7Z_4qVw-8XI3Df6xRxK-AcssfifQ1gnoHHcVEWI';
-const clienteSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+import { clienteSupabase } from './supabase.js';
 
 // 2. Traer el catálogo de Supabase
 async function cargarCatalogoPublico() {
@@ -41,15 +38,19 @@ function renderizarProductos(productos) {
     productos.forEach(prod => {
         contenedor.innerHTML += `
         <article class="bg-surface-container-lowest rounded-2xl overflow-hidden soft-shadow group flex flex-col hover:-translate-y-1 transition-transform duration-300">
-            <div class="relative h-56 overflow-hidden bg-white">
-                <img src="${prod.imagen_url}" alt="${prod.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                <span class="absolute top-3 left-3 bg-surface/90 backdrop-blur-md px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-primary shadow-sm">
-                    ${prod.categoria || 'Nuevo'}
-                </span>
-            </div>
+            <a href="detalle.html?id=${prod.id}" class="block">
+                <div class="relative h-56 overflow-hidden bg-white">
+                    <img src="${prod.imagen_url}" alt="${prod.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <span class="absolute top-3 left-3 bg-surface/90 backdrop-blur-md px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-primary shadow-sm">
+                        ${prod.categoria || 'Nuevo'}
+                    </span>
+                </div>
+            </a>
             
             <div class="p-5 flex flex-col flex-grow">
-                <h3 class="font-headline-md text-lg text-on-surface font-bold leading-tight mb-1 truncate" title="${prod.nombre}">${prod.nombre}</h3>
+                <a href="detalle.html?id=${prod.id}" class="block">
+                    <h3 class="font-headline-md text-lg text-on-surface font-bold leading-tight mb-1 truncate hover:text-primary transition-colors" title="${prod.nombre}">${prod.nombre}</h3>
+                </a>
                 
                 <div class="mt-auto pt-3">
                     <p class="font-body-lg text-primary font-bold text-xl mb-4">$${prod.precio.toFixed(2)} <span class="text-xs text-on-surface-variant font-normal">MXN</span></p>
@@ -64,11 +65,37 @@ function renderizarProductos(productos) {
     });
 }
 
-// 4. Lógica básica del carrito (para que no de error el botón por ahora)
+// 4. Lógica del carrito: guardar en localStorage
 window.agregarAlCarrito = function(id, nombre, precio) {
-    // Aquí después programaremos el guardado en localStorage
-    alert(`¡${nombre} añadido al carrito por $${precio}!`);
+    let carrito = JSON.parse(localStorage.getItem('carrito-crochet')) || [];
+
+    // Si el producto ya está en el carrito, solo le sumamos cantidad
+    const existente = carrito.find(item => item.id === id);
+    if (existente) {
+        existente.cantidad = (existente.cantidad || 1) + 1;
+    } else {
+        carrito.push({ id, nombre, precio, cantidad: 1 });
+    }
+
+    localStorage.setItem('carrito-crochet', JSON.stringify(carrito));
+    actualizarContadorCarrito();
+    alert(`¡${nombre} añadido al carrito!`);
 }
+
+// 5. Actualiza el numerito del carrito en el header
+function actualizarContadorCarrito() {
+    const carrito = JSON.parse(localStorage.getItem('carrito-crochet')) || [];
+    const totalItems = carrito.reduce((total, item) => total + (item.cantidad || 1), 0);
+    const contador = document.getElementById('contador-carrito');
+
+    if (contador) {
+        contador.innerText = totalItems;
+        contador.classList.toggle('hidden', totalItems === 0);
+    }
+}
+
+// Llamamos al contador en cuanto carga la página
+actualizarContadorCarrito();
 
 // 5. ¡Arrancamos motores!
 cargarCatalogoPublico();

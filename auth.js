@@ -1,7 +1,4 @@
-// 1. Configuración de Supabase
-const supabaseUrl = 'https://caffwjycgjomyejboyup.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhZmZ3anljZ2pvbXllamJveXVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzQ3MTIsImV4cCI6MjA5NzkxMDcxMn0.VKIL7Z_4qVw-8XI3Df6xRxK-AcssfifQ1gnoHHcVEWI';
-const clienteSupabase = supabase.createClient(supabaseUrl, supabaseKey);
+import { clienteSupabase } from './supabase.js';
 
 // 2. Lógica del formulario de login
 document.getElementById('login-form').addEventListener('submit', async function(evento) {

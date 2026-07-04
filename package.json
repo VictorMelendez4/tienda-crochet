@@ -1,0 +1,27 @@
+{
+  "name": "tienda-crochet",
+  "version": "1.0.0",
+  "description": "\"# tienda-crochet\"",
+  "main": "admin-dashboard.js",
+"scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "tailwindcss -i ./src/input.css -o ./tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./tailwind.css --watch"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VictorMelendez4/tienda-crochet.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VictorMelendez4/tienda-crochet/issues"
+  },
+  "homepage": "https://github.com/VictorMelendez4/tienda-crochet#readme",
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.11",
+    "tailwindcss": "^3.4.19"
+  }
+}
