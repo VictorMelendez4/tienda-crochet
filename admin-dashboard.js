@@ -1,4 +1,5 @@
 import { clienteSupabase } from './supabase.js';
+import { escapeHTML } from './utils.js';
 
 let productosGlobales = [];
 let galeriaActual = [];
@@ -140,6 +141,7 @@ async function cargarInventario() {
     productosGlobales = data;
     actualizarMetricas(data);
     renderizarEstructuraInventario(data);
+    revisarStockBajo(data);
 }
 
 function actualizarMetricas(productos) {
@@ -176,12 +178,12 @@ function renderizarEstructuraInventario(productos) {
         <article class="bg-white rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border border-[#EFEFD7]/50 shadow-[0_2px_10px_rgba(0,0,0,0.01)] hover:shadow-md transition-shadow">
             
             <div class="flex items-center gap-4 min-w-0 flex-1">
-                <img src="${prod.imagen_url}" alt="${prod.nombre}" class="w-16 h-16 rounded-xl object-cover bg-[#FAF9F5] border border-gray-100 flex-shrink-0">
+                <img src="${escapeHTML(prod.imagen_url)}" alt="${escapeHTML(prod.nombre)}" class="w-16 h-16 rounded-xl object-cover bg-[#FAF9F5] border border-gray-100 flex-shrink-0">
                 <div class="truncate">
-                    <h3 class="font-semibold text-base text-[#1B1D0E] truncate">${prod.nombre}</h3>
+                    <h3 class="font-semibold text-base text-[#1B1D0E] truncate">${escapeHTML(prod.nombre)}</h3>
                     <div class="flex items-center gap-2 mt-1 flex-wrap">
                         <span class="text-[#7C5544] text-sm font-bold">$${(prod.precio || 0).toFixed(2)} MXN</span>
-                        <span class="text-[10px] bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded-md border border-gray-200">${prod.categoria || 'Sin categoría'}</span>
+                        <span class="text-[10px] bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded-md border border-gray-200">${escapeHTML(prod.categoria) || 'Sin categoría'}</span>
                         ${tieneGaleria ? `<span class="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5"><span class="material-symbols-outlined text-[10px]">filter_none</span>+${prod.galeria.length - 1}</span>` : ''}
                     </div>
                 </div>
@@ -456,10 +458,10 @@ async function cargarCategorias() {
         listaHTML += `
             <li class="flex justify-between items-center p-3 hover:bg-white transition-colors">
                 <div>
-                    <span class="text-sm font-semibold text-gray-700 block">${cat.nombre}</span>
-                    ${cat.descripcion ? `<span class="text-[10px] text-gray-400 block mt-0.5">${cat.descripcion}</span>` : ''}
+                    <span class="text-sm font-semibold text-gray-700 block">${escapeHTML(cat.nombre)}</span>
+                    ${cat.descripcion ? `<span class="text-[10px] text-gray-400 block mt-0.5">${escapeHTML(cat.descripcion)}</span>` : ''}
                 </div>
-                <button onclick="borrarCategoria(${cat.id}, '${cat.nombre}')" class="text-gray-400 hover:text-red-500 hover:bg-red-50 w-8 h-8 flex items-center justify-center rounded-lg transition-colors" title="Eliminar Categoría">
+                <button data-id="${cat.id}" data-nombre="${escapeHTML(cat.nombre)}" class="btn-borrar-categoria text-gray-400 hover:text-red-500 hover:bg-red-50 w-8 h-8 flex items-center justify-center rounded-lg transition-colors" title="Eliminar Categoría">
                     <span class="material-symbols-outlined text-[16px]">delete</span>
                 </button>
             </li>`;
@@ -468,6 +470,14 @@ async function cargarCategorias() {
     if (selectCrear) selectCrear.innerHTML = opcionesHTML;
     if (selectEditar) selectEditar.innerHTML = opcionesHTML;
     if (listaModal) listaModal.innerHTML = listaHTML;
+
+    // Conectamos los botones de borrar sin meter el nombre en un onclick
+    listaModal.querySelectorAll('.btn-borrar-categoria').forEach(boton => {
+        boton.addEventListener('click', () => {
+            borrarCategoria(Number(boton.dataset.id), boton.dataset.nombre);
+        });
+    });
+
 }
 
 document.getElementById('form-agregar-categoria').addEventListener('submit', async function(e) {
@@ -594,6 +604,7 @@ function renderizarPedidos() {
                 <div>
                     <p class="font-bold text-[#1B1D0E]">Pedido #${pedido.id}</p>
                     <p class="text-xs text-gray-400">${fecha}</p>
+                    ${pedido.cliente_nombre ? `<p class="text-sm text-[#7C5544] font-semibold mt-1">${escapeHTML(pedido.cliente_nombre)} · ${escapeHTML(pedido.cliente_telefono || '')}</p>` : ''}
                 </div>
                 <span class="text-xs font-bold px-3 py-1 rounded-full border ${estiloBadge} capitalize">${pedido.estado}</span>
             </div>
@@ -630,9 +641,38 @@ window.filtrarPedidos = function(estado) {
 }
 
 window.actualizarEstadoPedido = async function(id, nuevoEstado) {
+    const pedido = pedidosGlobales.find(p => p.id === id);
+    if (!pedido) return;
+
+    const datosActualizar = { estado: nuevoEstado };
+
+    // Descontamos stock solo la PRIMERA vez que el pedido se confirma
+    if (nuevoEstado === 'confirmado' && !pedido.stock_descontado) {
+        for (const item of pedido.items) {
+            const { error: errorStock } = await clienteSupabase.rpc('decrementar_stock', {
+                p_producto_id: item.id,
+                p_cantidad: item.cantidad || 1
+            });
+            if (errorStock) console.error(`Error descontando stock de ${item.nombre}:`, errorStock);
+        }
+        datosActualizar.stock_descontado = true;
+    }
+
+    // Si cancelas un pedido al que ya se le había descontado stock, se lo regresamos
+    if (nuevoEstado === 'cancelado' && pedido.stock_descontado) {
+        for (const item of pedido.items) {
+            const { error: errorStock } = await clienteSupabase.rpc('restaurar_stock', {
+                p_producto_id: item.id,
+                p_cantidad: item.cantidad || 1
+            });
+            if (errorStock) console.error(`Error restaurando stock de ${item.nombre}:`, errorStock);
+        }
+        datosActualizar.stock_descontado = false;
+    }
+
     const { error } = await clienteSupabase
         .from('pedidos')
-        .update({ estado: nuevoEstado })
+        .update(datosActualizar)
         .eq('id', id);
 
     if (error) {
@@ -640,7 +680,9 @@ window.actualizarEstadoPedido = async function(id, nuevoEstado) {
         console.error(error);
         return;
     }
+
     cargarPedidos();
+    cargarInventario(); // refresca el stock visible en la lista de inventario
 }
 
 // --- CAMBIO ENTRE PESTAÑAS ---
@@ -672,3 +714,33 @@ window.cambiarVista = function(vista) {
 cargarCategorias();
 cargarInventario();
 cargarPedidos();
+
+// --- ALERTA DE STOCK BAJO ---
+const UMBRAL_STOCK_BAJO = 3;
+
+function revisarStockBajo(productos) {
+    const contenedor = document.getElementById('alerta-stock-bajo');
+    const mensaje = document.getElementById('alerta-stock-mensaje');
+    if (!contenedor || !mensaje) return;
+
+    const productosBajos = productos.filter(p => (p.stock ?? 0) <= UMBRAL_STOCK_BAJO && (p.stock ?? 0) > 0);
+    const productosAgotados = productos.filter(p => (p.stock ?? 0) <= 0);
+
+    if (productosBajos.length === 0 && productosAgotados.length === 0) {
+        contenedor.classList.add('hidden');
+        return;
+    }
+
+    const partes = [];
+    if (productosAgotados.length > 0) {
+        const nombres = productosAgotados.map(p => escapeHTML(p.nombre)).join(', ');
+        partes.push(`<strong>Agotados:</strong> ${nombres}`);
+    }
+    if (productosBajos.length > 0) {
+        const nombres = productosBajos.map(p => `${escapeHTML(p.nombre)} (${p.stock})`).join(', ');
+        partes.push(`<strong>Stock bajo:</strong> ${nombres}`);
+    }
+
+    mensaje.innerHTML = partes.join(' &nbsp;·&nbsp; ');
+    contenedor.classList.remove('hidden');
+}

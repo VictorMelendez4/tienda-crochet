@@ -4,6 +4,10 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Crochet Catalog</title>
+    <meta name="description" content="Amigurumis y piezas de crochet tejidas a mano. Catálogo de tejidos artesanales, hechos uno por uno con hilos de calidad.">
+    <meta property="og:title" content="Crochet Catalog — Tejidos Artesanales">
+    <meta property="og:description" content="Amigurumis y piezas de crochet tejidas a mano, una por una.">
+    <meta property="og:type" content="website">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="tailwind.css">
@@ -61,10 +65,10 @@
                 <button class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click">
                     <span class="material-symbols-outlined" data-icon="search">search</span>
                 </button>
-                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click flex items-center" href="cart.html">
+                <button onclick="abrirCarritoDrawer()" class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click flex items-center" aria-label="Ver carrito">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
                     <span id="contador-carrito" class="ml-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
-                </a>
+                </button>
             </div>
         </div>
     </header>
@@ -87,6 +91,26 @@
             <div class="flex justify-between items-end mb-stack-md">
                 <h2 class="font-headline-lg text-2xl font-bold text-on-surface">New Arrivals</h2>
             </div>
+
+
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-4 mb-10 soft-shadow">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-grow">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+                        <input type="text" id="buscador-catalogo" aria-label="Buscar tejidos" oninput="aplicarFiltros()" placeholder="Buscar tejidos..." class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-outline-variant/40 bg-surface focus:outline-none focus:border-primary text-sm transition-colors">
+                    </div>
+                    <div class="flex gap-3 shrink-0">
+                        <select id="filtro-categoria" aria-label="Filtrar por categoría" onchange="aplicarFiltros()" class="flex-1 sm:flex-none sm:min-w-[180px] px-4 py-3.5 rounded-xl border border-outline-variant/40 bg-surface focus:outline-none focus:border-primary text-sm cursor-pointer">
+                            <option value="">Todas las categorías</option>
+                        </select>
+                        <select id="filtro-orden" aria-label="Ordenar productos" onchange="aplicarFiltros()" class="flex-1 sm:flex-none sm:min-w-[170px] px-4 py-3.5 rounded-xl border border-outline-variant/40 bg-surface focus:outline-none focus:border-primary text-sm cursor-pointer">
+                            <option value="nuevo">Más nuevos</option>
+                            <option value="precio-asc">Precio: menor a mayor</option>
+                            <option value="precio-desc">Precio: mayor a menor</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
             
             <div id="contenedor-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
                 <p class="col-span-full text-center py-10 font-body-lg text-on-surface-variant">
@@ -97,7 +121,26 @@
         </section>
     </main>
 
-    <button id="btn-whatsapp" onclick="window.location.href='cart.html'" class="flex items-center gap-2">🛒 Ver Carrito</button>
+    <button id="btn-whatsapp" onclick="abrirCarritoDrawer()" class="flex items-center gap-2">🛒 Ver Carrito</button>
+
+    <div id="overlay-carrito" class="hidden fixed inset-0 bg-black/50 z-[90]" onclick="cerrarCarritoDrawer()"></div>
+    <aside id="drawer-carrito" class="fixed top-0 right-0 h-full w-full max-w-md bg-surface z-[95] translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+        <div class="flex justify-between items-center p-6 border-b border-outline-variant/30">
+            <h2 class="font-display text-xl font-bold text-on-surface">Tu carrito</h2>
+            <button onclick="cerrarCarritoDrawer()" class="text-on-surface-variant hover:text-primary transition-colors" aria-label="Cerrar carrito">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="drawer-lista-items" class="flex-grow overflow-y-auto p-6 flex flex-col gap-4"></div>
+        <div class="border-t border-outline-variant/30 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <span class="font-bold text-on-surface">Subtotal</span>
+                <span id="drawer-subtotal" class="font-bold text-xl text-primary">$0.00 MXN</span>
+            </div>
+            <a href="cart.html" class="block w-full bg-primary text-on-primary font-bold text-center py-3.5 rounded-full hover:opacity-90 transition-opacity mb-2">Ver carrito completo</a>
+            <button onclick="cerrarCarritoDrawer()" class="block w-full text-center text-sm text-on-surface-variant hover:text-primary transition-colors py-2">Seguir comprando</button>
+        </div>
+    </aside>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="app.js"></script>

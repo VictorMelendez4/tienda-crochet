@@ -4,6 +4,8 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Shopping Cart</title>
+    <meta name="description" content="Tu carrito de compras — Crochet Catalog">
+    <meta name="robots" content="noindex">
     <link rel="stylesheet" href="tailwind.css">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     
@@ -33,6 +35,19 @@
             <div class="w-full lg:w-96 shrink-0">
                 <div class="bg-white rounded-2xl p-8 shadow-lg sticky top-24">
                     <h2 class="text-2xl font-bold mb-6">Order Summary</h2>
+
+                    <div class="space-y-3 mb-6">
+                        <div>
+                            <label for="cliente-nombre" class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Tu nombre</label>
+                            <input type="text" id="cliente-nombre" placeholder="Ej. María López" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#7c5544] bg-gray-50 text-sm">
+                        </div>
+                        <div>
+                            <label for="cliente-telefono" class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Tu WhatsApp</label>
+                            <input type="tel" id="cliente-telefono" placeholder="Ej. 8711234567" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#7c5544] bg-gray-50 text-sm">
+                        </div>
+                        <p id="error-datos-cliente" class="text-xs text-red-500 font-medium hidden"></p>
+                    </div>
+
                     <div class="space-y-4 border-b border-gray-200 pb-6 mb-6">
                         <div class="flex justify-between text-gray-600">
                             <span>Subtotal</span>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crochet Catalog</title>
+    <meta name="description" content="Amigurumis y piezas de crochet tejidas a mano. Catálogo de tejidos artesanales, hechos uno por uno con hilos de calidad.">
+    <meta property="og:title" content="Sobre Nosotros — Crochet Catalog">
+    <meta property="og:description" content="Piezas de crochet tejidas a mano, una por una, con hilos de calidad y mucho cariño.">
+    <meta property="og:type" content="website">
+
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="tailwind.css">
+
+    <style>
+        html { scroll-behavior: smooth; }
+        .soft-shadow { box-shadow: 0 10px 30px rgba(124, 85, 68, 0.08); }
+        .squish-click:active { transform: scale(0.98); }
+    </style>
+</head>
+<body class="font-body bg-background text-on-surface antialiased pb-24 md:pb-0">
+
+    <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
+            <div class="flex items-center gap-6">
+                <button class="md:hidden text-on-surface-variant hover:opacity-80 transition-opacity">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <a class="font-display text-2xl font-bold text-primary" href="index.html">Crochet Catalog</a>
+            </div>
+            <nav class="hidden md:flex gap-8 items-center text-sm font-medium">
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html#catalogo">Browse</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="custom-orders.html">Custom Orders</a>
+                <a class="text-primary border-b-2 border-primary pb-1" href="about.html">About</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <a class="text-on-surface-variant hover:opacity-80 transition-opacity flex items-center" href="cart.html">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
+                    <span id="contador-carrito" class="ml-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO: mucho más aire respecto al header fijo -->
+        <section class="max-w-3xl mx-auto px-6 pt-44 pb-16 text-center">
+            <span class="text-xs font-bold uppercase tracking-widest text-primary">Nuestra historia</span>
+            <h1 class="font-display text-4xl md:text-5xl font-bold text-on-surface mt-4 mb-6 leading-tight">Tejido puntada por puntada</h1>
+            <p class="text-on-surface-variant text-lg leading-relaxed max-w-2xl mx-auto">
+                Crochet Catalog nació de un gancho, un ovillo de estambre y muchas tardes practicando puntadas hasta que salieran bien.
+                Hoy cada pieza que ves en el catálogo sigue haciéndose igual: a mano, una por una, sin líneas de producción ni prisas.
+            </p>
+        </section>
+
+        <!-- Divisor de marca: el mismo "hilo" ondulado que en el detalle de producto -->
+        <div class="max-w-md mx-auto px-6">
+            <svg class="w-full h-6 text-outline-variant" viewBox="0 0 400 24" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M0 12 Q 10 2, 20 12 T 40 12 T 60 12 T 80 12 T 100 12 T 120 12 T 140 12 T 160 12 T 180 12 T 200 12 T 220 12 T 240 12 T 260 12 T 280 12 T 300 12 T 320 12 T 340 12 T 360 12 T 380 12 T 400 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <!-- Sección de valores: íconos con contenedor, más aire entre tarjetas -->
+        <section class="max-w-6xl mx-auto px-6 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-surface-container-lowest rounded-2xl p-10 soft-shadow text-center hover:-translate-y-1 transition-transform duration-300">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                        <span class="material-symbols-outlined text-primary text-3xl">volunteer_activism</span>
+                    </div>
+                    <h3 class="font-display font-bold text-lg text-on-surface mb-2">Hecho a mano</h3>
+                    <p class="text-sm text-on-surface-variant leading-relaxed">Cada figura, bolsa o accesorio se teje a gancho, sin moldes industriales ni máquinas.</p>
+                </div>
+                <div class="bg-surface-container-lowest rounded-2xl p-10 soft-shadow text-center hover:-translate-y-1 transition-transform duration-300">
+                    <div class="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-5">
+                        <span class="material-symbols-outlined text-secondary text-3xl">eco</span>
+                    </div>
+                    <h3 class="font-display font-bold text-lg text-on-surface mb-2">Materiales de calidad</h3>
+                    <p class="text-sm text-on-surface-variant leading-relaxed">Trabajamos con estambres seleccionados por su suavidad, durabilidad y color.</p>
+                </div>
+                <div class="bg-surface-container-lowest rounded-2xl p-10 soft-shadow text-center hover:-translate-y-1 transition-transform duration-300">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                        <span class="material-symbols-outlined text-primary text-3xl">favorite</span>
+                    </div>
+                    <h3 class="font-display font-bold text-lg text-on-surface mb-2">Piezas únicas</h3>
+                    <p class="text-sm text-on-surface-variant leading-relaxed">Al ser tejidas a mano, cada pieza tiene pequeños detalles que la hacen irrepetible.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA final: fondo con tinte propio para que destaque del resto -->
+        <section class="max-w-6xl mx-auto px-6 pb-24">
+            <div class="bg-primary/5 border border-primary/10 rounded-3xl p-12 text-center">
+                <h2 class="font-display text-2xl md:text-3xl font-bold text-on-surface mb-3">¿Buscas algo que no está en el catálogo?</h2>
+                <p class="text-on-surface-variant mb-8 max-w-lg mx-auto">También hacemos diseños personalizados. Cuéntanos tu idea y la tejemos para ti.</p>
+                <a href="custom-orders.html" class="inline-flex items-center gap-2 bg-primary text-on-primary font-bold px-8 py-3.5 rounded-full soft-shadow hover:opacity-90 squish-click transition-all">
+                    Pedidos personalizados
+                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function actualizarContadorCarritoHeader() {
+            const carrito = JSON.parse(localStorage.getItem('carrito-crochet')) || [];
+            const totalItems = carrito.reduce((total, item) => total + (item.cantidad || 1), 0);
+            const contador = document.getElementById('contador-carrito');
+            if (contador) {
+                contador.innerText = totalItems;
+                contador.classList.toggle('hidden', totalItems === 0);
+            }
+        }
+        actualizarContadorCarritoHeader();
+    </script>
+</body>
+</html>

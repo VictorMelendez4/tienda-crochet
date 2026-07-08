@@ -1,4 +1,6 @@
 import { clienteSupabase } from './supabase.js';
+import { escapeHTML } from './utils.js';
+
 // 1. Cargamos el carrito desde el almacenamiento del navegador
 let carrito = JSON.parse(localStorage.getItem('carrito-crochet')) || [];
 
@@ -33,7 +35,7 @@ carrito.forEach((item, index) => {
     contenedor.innerHTML += `
         <div class="bg-white rounded-xl p-4 flex gap-4 shadow-sm items-center border border-gray-100">
             <div class="flex-grow">
-                <h3 class="font-bold text-lg">${item.nombre}</h3>
+                <h3 class="font-bold text-lg">${escapeHTML(item.nombre)}</h3>
                 <p class="text-[#7c5544] font-bold">$${item.precio} MXN</p>
             </div>
             
@@ -70,6 +72,17 @@ window.enviarPedidoWhatsApp = async function() {
         return;
     }
 
+    const nombreCliente = document.getElementById('cliente-nombre').value.trim();
+    const telefonoCliente = document.getElementById('cliente-telefono').value.trim();
+    const errorEl = document.getElementById('error-datos-cliente');
+
+    if (!nombreCliente || !telefonoCliente) {
+        errorEl.innerText = "Por favor completa tu nombre y WhatsApp para continuar.";
+        errorEl.classList.remove('hidden');
+        return;
+    }
+    errorEl.classList.add('hidden');
+
     const btnCheckout = document.querySelector('[onclick="enviarPedidoWhatsApp()"]');
     if (btnCheckout) {
         btnCheckout.disabled = true;
@@ -83,9 +96,16 @@ window.enviarPedidoWhatsApp = async function() {
     });
 
     // 1. Guardamos el pedido en Supabase antes que nada
+    // 1. Guardamos el pedido en Supabase antes que nada
     const { data: pedidoGuardado, error } = await clienteSupabase
         .from('pedidos')
-        .insert([{ items: carrito, total: total, estado: 'pendiente' }])
+        .insert([{
+            items: carrito,
+            total: total,
+            estado: 'pendiente',
+            cliente_nombre: nombreCliente,
+            cliente_telefono: telefonoCliente
+        }])
         .select()
         .single();
 
@@ -100,7 +120,7 @@ window.enviarPedidoWhatsApp = async function() {
     }
 
     // 2. Armamos el mensaje de WhatsApp, incluyendo el número de pedido
-    let textoPedido = `Hola, quiero confirmar mi pedido #${pedidoGuardado.id}:%0A%0A`;
+    let textoPedido = `Hola, soy ${nombreCliente}. Quiero confirmar mi pedido #${pedidoGuardado.id}:%0A%0A`;
 
     carrito.forEach(item => {
         const cantidad = item.cantidad || 1;

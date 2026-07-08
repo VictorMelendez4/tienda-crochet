@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos Personalizados — Crochet Catalog</title>
+    <meta name="description" content="Cuéntanos tu idea y la tejemos para ti. Aceptamos pedidos personalizados de crochet a la medida.">
+    <meta property="og:title" content="Pedidos Personalizados — Crochet Catalog">
+    <meta property="og:description" content="Cuéntanos tu idea y la tejemos para ti.">
+    <meta property="og:type" content="website">
+
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="tailwind.css">
+
+    <style>
+        html { scroll-behavior: smooth; }
+        .soft-shadow { box-shadow: 0 10px 30px rgba(124, 85, 68, 0.08); }
+        .squish-click:active { transform: scale(0.98); }
+    </style>
+</head>
+<body class="font-body bg-background text-on-surface antialiased pb-24 md:pb-0">
+
+    <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
+            <div class="flex items-center gap-6">
+                <button class="md:hidden text-on-surface-variant hover:opacity-80 transition-opacity">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <a class="font-display text-2xl font-bold text-primary" href="index.html">Crochet Catalog</a>
+            </div>
+            <nav class="hidden md:flex gap-8 items-center text-sm font-medium">
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html#catalogo">Browse</a>
+                <a class="text-primary border-b-2 border-primary pb-1" href="custom-orders.html">Custom Orders</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="about.html">About</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <a class="text-on-surface-variant hover:opacity-80 transition-opacity flex items-center" href="cart.html">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
+                    <span id="contador-carrito" class="ml-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO: mismo respiro generoso que en about.html -->
+        <section class="max-w-3xl mx-auto px-6 pt-44 pb-16 text-center">
+            <span class="text-xs font-bold uppercase tracking-widest text-primary">Hecho a tu medida</span>
+            <h1 class="font-display text-4xl md:text-5xl font-bold text-on-surface mt-4 mb-6 leading-tight">Pedidos Personalizados</h1>
+            <p class="text-on-surface-variant text-lg leading-relaxed max-w-xl mx-auto">
+                ¿Tienes una idea en mente — un color específico, un personaje, un regalo con dedicatoria? Cuéntanoslo
+                y lo tejemos especialmente para ti.
+            </p>
+        </section>
+
+        <div class="max-w-md mx-auto px-6">
+            <svg class="w-full h-6 text-outline-variant" viewBox="0 0 400 24" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M0 12 Q 10 2, 20 12 T 40 12 T 60 12 T 80 12 T 100 12 T 120 12 T 140 12 T 160 12 T 180 12 T 200 12 T 220 12 T 240 12 T 260 12 T 280 12 T 300 12 T 320 12 T 340 12 T 360 12 T 380 12 T 400 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <!-- Pasos del proceso: conectados con línea, se siente una secuencia real -->
+        <section class="max-w-5xl mx-auto px-6 py-16">
+            <div class="relative grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-6">
+                <!-- Línea conectora, solo visible en desktop -->
+                <div class="hidden sm:block absolute top-8 left-[16.66%] right-[16.66%] h-0.5 bg-primary/20"></div>
+
+                <div class="relative flex flex-col items-center text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary text-on-primary flex items-center justify-center mb-5 shadow-lg z-10">
+                        <span class="material-symbols-outlined text-2xl">chat</span>
+                    </div>
+                    <h3 class="font-display font-bold text-base text-on-surface mb-2">Cuéntanos tu idea</h3>
+                    <p class="text-sm text-on-surface-variant leading-relaxed max-w-[220px]">Escríbenos por WhatsApp con tu idea, tamaño y colores preferidos.</p>
+                </div>
+
+                <div class="relative flex flex-col items-center text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary text-on-primary flex items-center justify-center mb-5 shadow-lg z-10">
+                        <span class="material-symbols-outlined text-2xl">receipt_long</span>
+                    </div>
+                    <h3 class="font-display font-bold text-base text-on-surface mb-2">Cotizamos juntos</h3>
+                    <p class="text-sm text-on-surface-variant leading-relaxed max-w-[220px]">Te confirmamos precio, tiempo de entrega y forma de pago.</p>
+                </div>
+
+                <div class="relative flex flex-col items-center text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary text-on-primary flex items-center justify-center mb-5 shadow-lg z-10">
+                        <span class="material-symbols-outlined text-2xl">favorite</span>
+                    </div>
+                    <h3 class="font-display font-bold text-base text-on-surface mb-2">Tejemos tu pieza</h3>
+                    <p class="text-sm text-on-surface-variant leading-relaxed max-w-[220px]">La hacemos a mano y coordinamos la entrega o el envío contigo.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA final: tinte propio, es el elemento con más peso de la página -->
+        <section class="max-w-5xl mx-auto px-6 pb-24">
+            <div class="bg-primary/5 border border-primary/10 rounded-3xl p-12 text-center">
+                <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                    <span class="material-symbols-outlined text-primary text-3xl">chat</span>
+                </div>
+                <h2 class="font-display text-2xl md:text-3xl font-bold text-on-surface mb-3">¿Listo para empezar?</h2>
+                <p class="text-on-surface-variant mb-8 max-w-md mx-auto">
+                    Da clic abajo para abrir WhatsApp con un mensaje ya listo — solo agrega los detalles de tu idea.
+                </p>
+                <a id="btn-whatsapp-custom" href="#" target="_blank" class="inline-flex items-center gap-2 bg-primary text-on-primary font-bold px-8 py-3.5 rounded-full soft-shadow hover:opacity-90 squish-click transition-all">
+                    <span class="material-symbols-outlined text-base">chat</span>
+                    Solicitar por WhatsApp
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function actualizarContadorCarritoHeader() {
+            const carrito = JSON.parse(localStorage.getItem('carrito-crochet')) || [];
+            const totalItems = carrito.reduce((total, item) => total + (item.cantidad || 1), 0);
+            const contador = document.getElementById('contador-carrito');
+            if (contador) {
+                contador.innerText = totalItems;
+                contador.classList.toggle('hidden', totalItems === 0);
+            }
+        }
+        actualizarContadorCarritoHeader();
+
+        const numeroWhatsApp = "528710000000";
+        const mensaje = encodeURIComponent("Hola, me gustaría hacer un pedido personalizado. Mi idea es: ");
+        document.getElementById('btn-whatsapp-custom').href = `https://wa.me/${numeroWhatsApp}?text=${mensaje}`;
+    </script>
+</body>
+</html>
