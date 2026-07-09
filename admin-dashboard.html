@@ -29,11 +29,19 @@
 </head>
 <body class="bg-[#FAF9F5] text-[#1B1D0E] min-h-screen antialiased selection:bg-[#7C5544]/10 selection:text-[#7C5544]">
 
+<div id="toast-nuevo-pedido" class="hidden fixed top-24 right-6 z-[100] bg-[#1B1D0E] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 max-w-sm transition-all duration-300">
+    <span class="material-symbols-outlined text-[#eebba6]">notifications_active</span>
+    <div>
+        <p class="font-bold text-sm">¡Nuevo pedido!</p>
+        <p id="toast-mensaje" class="text-xs text-gray-300"></p>
+    </div>
+</div>
+
     <main class="max-w-7xl mx-auto px-6 py-12">
         <header class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-12 pb-6 border-b border-[#EFEFD7]/60">
             <div>
-                <span class="text-xs uppercase tracking-widest text-[#7C5544] font-bold">Consola Interna</span>
-                <h1 class="text-4xl font-semibold text-[#1B1D0E] tracking-tight mt-1">Yarnly Studio</h1>
+                <span class="text-xs uppercase tracking-widest text-[#7C5544] font-bold">Administración Interna</span>
+                <h1 class="text-4xl font-semibold text-[#1B1D0E] tracking-tight mt-1">Studio</h1>
             </div>
             <button onclick="cerrarSesion()" class="self-start sm:self-auto flex items-center gap-2 text-sm text-[#7C5544] hover:text-[#1B1D0E] transition-all font-semibold bg-white border border-[#EFEFD7] px-5 py-2.5 rounded-full shadow-sm hover:shadow-md">
                 <span class="material-symbols-outlined text-base">logout</span>
@@ -83,6 +91,10 @@
             <button id="tab-pedidos" onclick="cambiarVista('pedidos')" class="px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-[#7C5544] transition-colors flex items-center gap-2">
                 Pedidos
                 <span id="badge-pedidos-pendientes" class="hidden bg-[#7C5544] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
+            <button id="tab-resenas" onclick="cambiarVista('resenas')" class="px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-[#7C5544] transition-colors flex items-center gap-2">
+                Reseñas
+                <span id="badge-resenas-pendientes" class="hidden bg-[#7C5544] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
             </button>
         </div>
 
@@ -144,14 +156,30 @@
         </div>
 
         <section id="vista-pedidos" class="hidden">
+            <div class="relative mb-4">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
+                <input type="text" id="buscador-pedidos" onkeyup="filtrarPedidosPorTexto()" placeholder="Buscar por cliente, producto o # de pedido..." class="w-full p-3.5 pl-11 border border-gray-100 rounded-xl focus:outline-none focus:border-[#7C5544] bg-[#FAF9F5] text-sm transition-colors">
+            </div>
             <div class="flex flex-wrap gap-2 mb-6">
-                <button onclick="filtrarPedidos('todos')" data-estado="todos" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-[#1B1D0E] text-white transition-colors">Todos</button>
-                <button onclick="filtrarPedidos('pendiente')" data-estado="pendiente" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Pendientes</button>
+                <button onclick="filtrarPedidos('esta-semana')" data-estado="esta-semana" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">event_upcoming</span>
+                    Para entregar
+                </button>
+                <button onclick="filtrarPedidos('todos')" data-estado="todos" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-[#1B1D0E] text-white transition-colors">Todos</button>                <button onclick="filtrarPedidos('pendiente')" data-estado="pendiente" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Pendientes</button>
                 <button onclick="filtrarPedidos('confirmado')" data-estado="confirmado" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Confirmados</button>
                 <button onclick="filtrarPedidos('enviado')" data-estado="enviado" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Enviados</button>
                 <button onclick="filtrarPedidos('cancelado')" data-estado="cancelado" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Cancelados</button>
             </div>
             <div id="lista-pedidos" class="grid grid-cols-1 gap-4"></div>
+        </section>
+
+        <section id="vista-resenas" class="hidden">
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button onclick="filtrarResenas('pendiente')" data-estado="pendiente" class="filtro-resena px-4 py-2 rounded-full text-xs font-bold bg-[#1B1D0E] text-white transition-colors">Pendientes</button>
+                <button onclick="filtrarResenas('aprobada')" data-estado="aprobada" class="filtro-resena px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Aprobadas</button>
+                <button onclick="filtrarResenas('todas')" data-estado="todas" class="filtro-resena px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors">Todas</button>
+            </div>
+            <div id="lista-resenas-admin" class="grid grid-cols-1 gap-4"></div>
         </section>
 
     </main>

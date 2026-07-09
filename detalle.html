@@ -33,6 +33,7 @@
                 <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html#catalogo">Browse</a>
                 <a class="text-on-surface-variant hover:text-primary transition-colors" href="custom-orders.html">Custom Orders</a>
                 <a class="text-on-surface-variant hover:text-primary transition-colors" href="about.html">About</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="faq.html">FAQ</a>
             </nav>
             <div class="flex items-center gap-4">
                 <button onclick="abrirCarritoDrawer()" class="text-on-surface-variant hover:opacity-80 transition-opacity flex items-center" aria-label="Ver carrito">
@@ -102,6 +103,11 @@
                     </div>
                 </div>
 
+                <button onclick="compartirProducto()" class="flex items-center gap-2 text-sm font-semibold text-primary hover:opacity-80 transition-opacity mt-5">
+                    <span class="material-symbols-outlined text-lg">share</span>
+                    Compartir este diseño
+                </button>
+
                 <svg class="w-full h-6 my-8 text-outline-variant" viewBox="0 0 400 24" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                     <path d="M0 12 Q 10 2, 20 12 T 40 12 T 60 12 T 80 12 T 100 12 T 120 12 T 140 12 T 160 12 T 180 12 T 200 12 T 220 12 T 240 12 T 260 12 T 280 12 T 300 12 T 320 12 T 340 12 T 360 12 T 380 12 T 400 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
@@ -121,6 +127,43 @@
                     <p class="text-sm text-on-surface-variant mt-3 leading-relaxed">Al finalizar tu compra te contactamos por WhatsApp para confirmar el pedido, acordar el envío y compartirte los datos para tu pago.</p>
                 </details>
             </div>
+        </section>
+
+        <section class="border-t border-outline-variant/30 pt-12 mt-16">
+            <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-on-surface">Reseñas</h2>
+                    <div id="resenas-resumen" class="flex items-center gap-2 mt-1 text-sm text-on-surface-variant"></div>
+                </div>
+                <button onclick="abrirFormResena()" class="text-sm font-bold text-primary hover:opacity-80 transition-opacity flex items-center gap-1">
+                    <span class="material-symbols-outlined text-lg">rate_review</span>
+                    Dejar una reseña
+                </button>
+            </div>
+
+            <div id="form-resena" class="hidden bg-surface-container-lowest rounded-2xl p-6 soft-shadow mb-8">
+                <h3 class="font-bold text-on-surface mb-4">Cuéntanos qué te pareció</h3>
+                <div class="mb-4">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-2">Tu calificación</label>
+                    <div id="selector-estrellas" class="flex gap-1"></div>
+                </div>
+                <div class="mb-4">
+                    <label for="resena-nombre" class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1">Tu nombre</label>
+                    <input type="text" id="resena-nombre" placeholder="Ej. María" class="w-full p-3 rounded-xl border border-outline-variant/40 bg-surface text-sm focus:outline-none focus:border-primary">
+                </div>
+                <div class="mb-4">
+                    <label for="resena-telefono" class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1">Tu WhatsApp <span class="normal-case font-normal text-on-surface-variant/70">(opcional — para verificar tu compra)</span></label>
+                    <input type="tel" id="resena-telefono" placeholder="Ej. 8711234567" class="w-full p-3 rounded-xl border border-outline-variant/40 bg-surface text-sm focus:outline-none focus:border-primary">
+                </div>
+                <div class="mb-4">
+                    <label for="resena-comentario" class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1">Tu comentario (opcional)</label>
+                    <textarea id="resena-comentario" rows="3" placeholder="¿Qué te pareció el tejido?" class="w-full p-3 rounded-xl border border-outline-variant/40 bg-surface text-sm focus:outline-none focus:border-primary resize-none"></textarea>
+                </div>
+                <button onclick="enviarResena()" class="bg-primary text-on-primary font-bold text-sm px-6 py-3 rounded-xl hover:opacity-90 transition-opacity">Enviar reseña</button>
+                <p id="mensaje-resena" class="text-xs font-medium mt-3 hidden"></p>
+            </div>
+
+            <div id="lista-resenas" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
     </main>
 

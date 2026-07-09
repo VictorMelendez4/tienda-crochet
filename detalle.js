@@ -237,3 +237,166 @@ window.eliminarDelDrawer = function(index) {
 document.addEventListener('keydown', (evento) => {
     if (evento.key === 'Escape') cerrarCarritoDrawer();
 });
+
+// --- COMPARTIR PRODUCTO ---
+window.compartirProducto = async function() {
+    const titulo = document.getElementById('titulo-producto').innerText;
+    const url = window.location.href;
+    const texto = `¡Mira este tejido! ${titulo}`;
+
+    // En celulares modernos, usa el menú nativo de compartir del sistema
+    if (navigator.share) {
+        try {
+            await navigator.share({ title: titulo, text: texto, url: url });
+        } catch (e) {
+            // El usuario cerró el menú de compartir sin elegir nada — no es un error real
+        }
+        return;
+    }
+
+    // En desktop (sin soporte nativo), copiamos el link al portapapeles
+    try {
+        await navigator.clipboard.writeText(url);
+        mostrarAvisoCompartir('¡Link copiado! Ya puedes pegarlo donde quieras.');
+    } catch (e) {
+        mostrarAvisoCompartir(url, true);
+    }
+}
+
+function mostrarAvisoCompartir(mensaje, esFallback = false) {
+    const aviso = document.createElement('div');
+    aviso.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#1B1D0E] text-white text-sm font-medium px-5 py-3 rounded-full shadow-2xl z-[100] max-w-[90vw] text-center';
+    aviso.innerText = esFallback ? `Copia este link: ${mensaje}` : mensaje;
+    document.body.appendChild(aviso);
+    setTimeout(() => aviso.remove(), 3500);
+}
+
+// --- RESEÑAS ---
+let calificacionSeleccionada = 0;
+
+function generarEstrellas(calificacion, tamano = 'text-base') {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        html += `<span class="material-symbols-outlined ${tamano} ${i <= Math.round(calificacion) ? 'text-primary' : 'text-outline-variant'}" style="font-variation-settings: 'FILL' ${i <= Math.round(calificacion) ? 1 : 0};">star</span>`;
+    }
+    return html;
+}
+
+function renderizarSelectorEstrellas() {
+    const contenedor = document.getElementById('selector-estrellas');
+    if (!contenedor) return;
+    contenedor.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        const boton = document.createElement('button');
+        boton.type = 'button';
+        boton.className = 'selector-estrella';
+        boton.innerHTML = `<span class="material-symbols-outlined text-2xl ${i <= calificacionSeleccionada ? 'text-primary' : 'text-outline-variant'}" style="font-variation-settings: 'FILL' ${i <= calificacionSeleccionada ? 1 : 0};">star</span>`;
+        boton.addEventListener('click', () => {
+            calificacionSeleccionada = i;
+            renderizarSelectorEstrellas();
+        });
+        contenedor.appendChild(boton);
+    }
+}
+
+window.abrirFormResena = function() {
+    const form = document.getElementById('form-resena');
+    form.classList.toggle('hidden');
+    if (!form.classList.contains('hidden')) {
+        renderizarSelectorEstrellas();
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+async function cargarResenas() {
+    const { data: resenas, error } = await clienteSupabase
+        .from('resenas')
+        .select('*')
+        .eq('producto_id', productoId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error al cargar reseñas:", error);
+        return;
+    }
+
+    const resumen = document.getElementById('resenas-resumen');
+    const lista = document.getElementById('lista-resenas');
+
+    if (!resenas || resenas.length === 0) {
+        resumen.innerHTML = '<span>Sé la primera en dejar una reseña</span>';
+        lista.innerHTML = '';
+        return;
+    }
+
+    const promedio = resenas.reduce((suma, r) => suma + r.calificacion, 0) / resenas.length;
+    resumen.innerHTML = `${generarEstrellas(promedio)} <span class="ml-1">${promedio.toFixed(1)} · ${resenas.length} ${resenas.length === 1 ? 'reseña' : 'reseñas'}</span>`;
+
+    lista.innerHTML = resenas.map(r => `
+        <div class="bg-surface-container-lowest rounded-2xl p-5 soft-shadow">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5">
+                    <p class="font-bold text-sm text-on-surface">${escapeHTML(r.nombre_cliente)}</p>
+                    ${r.compra_verificada ? `<span class="flex items-center gap-0.5 bg-secondary/10 text-secondary text-[10px] font-bold px-2 py-0.5 rounded-full"><span class="material-symbols-outlined text-[12px]">verified</span>Compra verificada</span>` : ''}
+                </div>
+                <div class="flex">${generarEstrellas(r.calificacion, 'text-sm')}</div>
+            </div>
+            ${r.comentario ? `<p class="text-sm text-on-surface-variant leading-relaxed">${escapeHTML(r.comentario)}</p>` : ''}
+        </div>
+    `).join('');
+}
+
+window.enviarResena = async function() {
+    const nombre = document.getElementById('resena-nombre').value.trim();
+    const telefono = document.getElementById('resena-telefono').value.trim();
+    const comentario = document.getElementById('resena-comentario').value.trim();
+    const mensaje = document.getElementById('mensaje-resena');
+
+    if (!nombre || calificacionSeleccionada === 0) {
+        mensaje.innerText = 'Por favor pon tu nombre y selecciona una calificación.';
+        mensaje.className = 'text-xs font-medium mt-3 text-error';
+        mensaje.classList.remove('hidden');
+        return;
+    }
+
+    // Si dejó su teléfono, revisamos si compró este producto
+    let compraVerificada = false;
+    if (telefono) {
+        const { data: verificado, error: errorVerificacion } = await clienteSupabase
+            .rpc('verificar_compra', { p_telefono: telefono, p_producto_id: Number(productoId) });
+
+        if (errorVerificacion) {
+            console.warn("No se pudo verificar la compra:", errorVerificacion);
+        } else {
+            compraVerificada = verificado === true;
+        }
+    }
+
+    const { error } = await clienteSupabase
+        .from('resenas')
+        .insert([{
+            producto_id: Number(productoId),
+            nombre_cliente: nombre,
+            calificacion: calificacionSeleccionada,
+            comentario: comentario || null,
+            compra_verificada: compraVerificada
+        }]);
+
+    if (error) {
+        console.error("Error al enviar reseña:", error);
+        mensaje.innerText = 'Hubo un problema al enviar tu reseña. Intenta de nuevo.';
+        mensaje.className = 'text-xs font-medium mt-3 text-error';
+    } else {
+        mensaje.innerText = '¡Gracias por tu reseña!';
+        mensaje.className = 'text-xs font-medium mt-3 text-secondary';
+        document.getElementById('resena-nombre').value = '';
+        document.getElementById('resena-telefono').value = '';
+        document.getElementById('resena-comentario').value = '';
+        calificacionSeleccionada = 0;
+        renderizarSelectorEstrellas();
+        cargarResenas();
+    }
+    mensaje.classList.remove('hidden');
+}
+
+cargarResenas();

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preguntas Frecuentes — Crochet Catalog</title>
+    <meta name="description" content="Tiempos de entrega, envíos, pagos y política de cambios de Crochet Catalog.">
+    <meta property="og:title" content="Preguntas Frecuentes — Crochet Catalog">
+    <meta property="og:type" content="website">
+
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="tailwind.css">
+
+    <style>
+        html { scroll-behavior: smooth; }
+        .soft-shadow { box-shadow: 0 10px 30px rgba(124, 85, 68, 0.08); }
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] .chevron { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="font-body bg-background text-on-surface antialiased pb-24 md:pb-0">
+
+    <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
+            <div class="flex items-center gap-6">
+                <button class="md:hidden text-on-surface-variant hover:opacity-80 transition-opacity">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <a class="font-display text-2xl font-bold text-primary" href="index.html">Crochet Catalog</a>
+            </div>
+            <nav class="hidden md:flex gap-8 items-center text-sm font-medium">
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html#catalogo">Browse</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="custom-orders.html">Custom Orders</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="about.html">About</a>
+                <a class="text-primary border-b-2 border-primary pb-1" href="faq.html">FAQ</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <a class="text-on-surface-variant hover:opacity-80 transition-opacity flex items-center" href="cart.html">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
+                    <span id="contador-carrito" class="ml-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-6 pt-44 pb-24">
+        <div class="text-center mb-14">
+            <span class="text-xs font-bold uppercase tracking-widest text-primary">Antes de comprar</span>
+            <h1 class="font-display text-4xl md:text-5xl font-bold text-on-surface mt-4 mb-6 leading-tight">Preguntas Frecuentes</h1>
+            <p class="text-on-surface-variant text-lg leading-relaxed max-w-xl mx-auto">
+                Todo lo que necesitas saber antes de hacer tu pedido. ¿No encuentras tu respuesta? Escríbenos por WhatsApp.
+            </p>
+        </div>
+
+        <div class="max-w-md mx-auto px-6 mb-14">
+            <svg class="w-full h-6 text-outline-variant" viewBox="0 0 400 24" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M0 12 Q 10 2, 20 12 T 40 12 T 60 12 T 80 12 T 100 12 T 120 12 T 140 12 T 160 12 T 180 12 T 200 12 T 220 12 T 240 12 T 260 12 T 280 12 T 300 12 T 320 12 T 340 12 T 360 12 T 380 12 T 400 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <div class="flex flex-col gap-3">
+
+            <details class="bg-surface-container-lowest rounded-2xl soft-shadow px-6 py-2 group">
+                <summary class="flex items-center justify-between py-4 font-bold text-on-surface">
+                    <span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">schedule</span>¿Cuánto tarda mi pedido?</span>
+                    <span class="material-symbols-outlined chevron transition-transform text-on-surface-variant">expand_more</span>
+                </summary>
+                <p class="text-sm text-on-surface-variant leading-relaxed pb-5 pl-9">
+                    Cada pieza se teje a mano bajo pedido, así que el tiempo de entrega varía según el diseño y cuántos pedidos tengamos en cola — generalmente toma de algunos días a un par de semanas. En cuanto confirmamos tu pedido por WhatsApp, te damos un estimado claro para tu caso específico.
+                </p>
+            </details>
+
+            <details class="bg-surface-container-lowest rounded-2xl soft-shadow px-6 py-2 group">
+                <summary class="flex items-center justify-between py-4 font-bold text-on-surface">
+                    <span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">local_shipping</span>¿Hacen envíos a otras ciudades?</span>
+                    <span class="material-symbols-outlined chevron transition-transform text-on-surface-variant">expand_more</span>
+                </summary>
+                <p class="text-sm text-on-surface-variant leading-relaxed pb-5 pl-9">
+                    Sí. Hacemos entrega local en persona (coordinamos punto y hora contigo) y también envíos nacionales por paquetería a cualquier ciudad. El costo de envío se calcula según tu ubicación y se confirma antes de cerrar el pedido.
+                </p>
+            </details>
+
+            <details class="bg-surface-container-lowest rounded-2xl soft-shadow px-6 py-2 group">
+                <summary class="flex items-center justify-between py-4 font-bold text-on-surface">
+                    <span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">payments</span>¿Cómo funciona el pago?</span>
+                    <span class="material-symbols-outlined chevron transition-transform text-on-surface-variant">expand_more</span>
+                </summary>
+                <p class="text-sm text-on-surface-variant leading-relaxed pb-5 pl-9">
+                    Al finalizar tu compra en el sitio, te contactamos por WhatsApp para confirmar los detalles del pedido y compartirte los datos para tu depósito o transferencia. El pedido entra a producción una vez confirmado el pago.
+                </p>
+            </details>
+
+            <details class="bg-surface-container-lowest rounded-2xl soft-shadow px-6 py-2 group">
+                <summary class="flex items-center justify-between py-4 font-bold text-on-surface">
+                    <span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">assignment_return</span>¿Aceptan cambios o devoluciones?</span>
+                    <span class="material-symbols-outlined chevron transition-transform text-on-surface-variant">expand_more</span>
+                </summary>
+                <p class="text-sm text-on-surface-variant leading-relaxed pb-5 pl-9">
+                    Como cada pieza se teje especialmente para ti bajo pedido, todas las ventas son finales y no manejamos cambios ni devoluciones. Si tu pedido llega con algún defecto de fabricación, contáctanos por WhatsApp — lo revisamos caso por caso.
+                </p>
+            </details>
+
+            <details class="bg-surface-container-lowest rounded-2xl soft-shadow px-6 py-2 group">
+                <summary class="flex items-center justify-between py-4 font-bold text-on-surface">
+                    <span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">dry_cleaning</span>¿Cómo cuido mi tejido?</span>
+                    <span class="material-symbols-outlined chevron transition-transform text-on-surface-variant">expand_more</span>
+                </summary>
+                <p class="text-sm text-on-surface-variant leading-relaxed pb-5 pl-9">
+                    Lava a mano con agua fría y jabón neutro. Sécalo sobre una superficie plana, lejos del sol directo, para que la fibra conserve su forma y color por más tiempo.
+                </p>
+            </details>
+
+            <details class="bg-surface-container-lowest rounded-2xl soft-shadow px-6 py-2 group">
+                <summary class="flex items-center justify-between py-4 font-bold text-on-surface">
+                    <span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">palette</span>¿Puedo pedir un diseño personalizado?</span>
+                    <span class="material-symbols-outlined chevron transition-transform text-on-surface-variant">expand_more</span>
+                </summary>
+                <p class="text-sm text-on-surface-variant leading-relaxed pb-5 pl-9">
+                    ¡Claro! Aceptamos pedidos personalizados: colores, tamaños o diseños específicos. Visita nuestra página de
+                    <a href="custom-orders.html" class="text-primary font-semibold hover:underline">Pedidos Personalizados</a>
+                    para ver cómo funciona el proceso.
+                </p>
+            </details>
+
+        </div>
+
+        <div class="bg-primary/5 border border-primary/10 rounded-3xl p-10 text-center mt-14">
+            <span class="material-symbols-outlined text-primary text-3xl mb-3">chat</span>
+            <h2 class="font-display text-xl font-bold text-on-surface mb-2">¿Tienes otra duda?</h2>
+            <p class="text-on-surface-variant text-sm mb-6">Escríbenos directo y te respondemos lo antes posible.</p>
+            <a id="btn-whatsapp-faq" href="#" target="_blank" class="inline-flex items-center gap-2 bg-primary text-on-primary font-bold px-8 py-3.5 rounded-full soft-shadow hover:opacity-90 transition-all">
+                <span class="material-symbols-outlined text-base">chat</span>
+                Escribir por WhatsApp
+            </a>
+        </div>
+    </main>
+
+    <script>
+        function actualizarContadorCarritoHeader() {
+            const carrito = JSON.parse(localStorage.getItem('carrito-crochet')) || [];
+            const totalItems = carrito.reduce((total, item) => total + (item.cantidad || 1), 0);
+            const contador = document.getElementById('contador-carrito');
+            if (contador) {
+                contador.innerText = totalItems;
+                contador.classList.toggle('hidden', totalItems === 0);
+            }
+        }
+        actualizarContadorCarritoHeader();
+
+        const numeroWhatsApp = "528710000000";
+        const mensaje = encodeURIComponent("Hola, tengo una pregunta sobre sus productos: ");
+        document.getElementById('btn-whatsapp-faq').href = `https://wa.me/${numeroWhatsApp}?text=${mensaje}`;
+    </script>
+</body>
+</html>

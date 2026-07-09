@@ -238,6 +238,10 @@ window.filtrarInventario = function() {
     renderizarEstructuraInventario(filtrados);
 }
 
+window.filtrarPedidosPorTexto = function() {
+    renderizarPedidos();
+}
+
 
 // --- CONSOLA MODAL DE EDICIÓN AVANZADA ---
 // --- CONSOLA MODAL DE EDICIÓN AVANZADA ---
@@ -574,12 +578,36 @@ function renderizarPedidos() {
     const lista = document.getElementById('lista-pedidos');
     if (!lista) return;
 
-    const pedidosFiltrados = filtroEstadoActual === 'todos'
-        ? pedidosGlobales
-        : pedidosGlobales.filter(p => p.estado === filtroEstadoActual);
+    let pedidosFiltrados;
+    if (filtroEstadoActual === 'esta-semana') {
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const enSieteDias = new Date(hoy);
+        enSieteDias.setDate(hoy.getDate() + 7);
+
+        pedidosFiltrados = pedidosGlobales
+            .filter(p => p.estado === 'confirmado' && p.fecha_entrega_estimada)
+            .filter(p => new Date(p.fecha_entrega_estimada + 'T00:00:00') <= enSieteDias)
+            .sort((a, b) => new Date(a.fecha_entrega_estimada) - new Date(b.fecha_entrega_estimada));
+    } else if (filtroEstadoActual === 'todos') {
+        pedidosFiltrados = pedidosGlobales;
+    } else {
+        pedidosFiltrados = pedidosGlobales.filter(p => p.estado === filtroEstadoActual);
+    }
+
+    const buscadorInput = document.getElementById('buscador-pedidos');
+    const texto = buscadorInput ? buscadorInput.value.toLowerCase().trim() : '';
+    if (texto) {
+        pedidosFiltrados = pedidosFiltrados.filter(p => {
+            const coincideId = String(p.id).includes(texto);
+            const coincideNombre = (p.cliente_nombre || '').toLowerCase().includes(texto);
+            const coincideProducto = (p.items || []).some(item => item.nombre.toLowerCase().includes(texto));
+            return coincideId || coincideNombre || coincideProducto;
+        });
+    }
 
     if (pedidosFiltrados.length === 0) {
-        lista.innerHTML = `<p class="text-center text-gray-400 py-10 text-sm">No hay pedidos en esta categoría.</p>`;
+        lista.innerHTML = `<p class="text-center text-gray-400 py-10 text-sm">No hay pedidos que coincidan con tu búsqueda.</p>`;
         return;
     }
 
@@ -604,10 +632,28 @@ function renderizarPedidos() {
                 <div>
                     <p class="font-bold text-[#1B1D0E]">Pedido #${pedido.id}</p>
                     <p class="text-xs text-gray-400">${fecha}</p>
-                    ${pedido.cliente_nombre ? `<p class="text-sm text-[#7C5544] font-semibold mt-1">${escapeHTML(pedido.cliente_nombre)} · ${escapeHTML(pedido.cliente_telefono || '')}</p>` : ''}
+                    ${pedido.cliente_nombre ? `<p class="text-sm text-[#7C5544] font-semibold mt-1">${escapeHTML(pedido.cliente_nombre)} · ${escapeHTML(pedido.cliente_telefono || '')} ${(() => {
+                        const totalCompras = calcularHistorialCliente(pedido.cliente_telefono);
+                        if (totalCompras && totalCompras > 1) {
+                            return `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full ml-1"><span class="material-symbols-outlined text-[11px]">favorite</span>Clienta recurrente · ${totalCompras} pedidos</span>`;
+                        }
+                        return '';
+                    })()}</p>` : ''}
                 </div>
                 <span class="text-xs font-bold px-3 py-1 rounded-full border ${estiloBadge} capitalize">${pedido.estado}</span>
             </div>
+
+            ${pedido.estado === 'confirmado' ? (() => {
+                const hoy = new Date(); hoy.setHours(0,0,0,0);
+                const atrasado = pedido.fecha_entrega_estimada && new Date(pedido.fecha_entrega_estimada + 'T00:00:00') < hoy;
+                return `
+            <div class="flex items-center gap-2 mb-4 rounded-xl p-3 ${atrasado ? 'bg-red-50' : 'bg-[#FAF9F5]'}">
+                <span class="material-symbols-outlined ${atrasado ? 'text-red-500' : 'text-[#7C5544]'} text-lg">event</span>
+                <label class="text-xs font-bold ${atrasado ? 'text-red-500' : 'text-gray-500'} whitespace-nowrap">Entrega estimada:</label>
+                <input type="date" value="${pedido.fecha_entrega_estimada || ''}" onchange="actualizarFechaEntrega(${pedido.id}, this.value)" class="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-[#7C5544]">
+                ${atrasado ? '<span class="text-xs font-bold text-red-500 ml-auto">¡Atrasado!</span>' : ''}
+            </div>`;
+            })() : ''}
 
             <ul class="border-t border-b border-gray-100 py-2 mb-4 divide-y divide-gray-50">
                 ${itemsHtml}
@@ -687,33 +733,155 @@ window.actualizarEstadoPedido = async function(id, nuevoEstado) {
 
 // --- CAMBIO ENTRE PESTAÑAS ---
 window.cambiarVista = function(vista) {
-    const vistaInventario = document.getElementById('vista-inventario');
-    const vistaPedidos = document.getElementById('vista-pedidos');
-    const tabInventario = document.getElementById('tab-inventario');
-    const tabPedidos = document.getElementById('tab-pedidos');
+    const vistas = {
+        inventario: { seccion: document.getElementById('vista-inventario'), tab: document.getElementById('tab-inventario') },
+        pedidos: { seccion: document.getElementById('vista-pedidos'), tab: document.getElementById('tab-pedidos') },
+        resenas: { seccion: document.getElementById('vista-resenas'), tab: document.getElementById('tab-resenas') }
+    };
 
-    if (vista === 'pedidos') {
-        vistaInventario.classList.add('hidden');
-        vistaPedidos.classList.remove('hidden');
-        tabPedidos.classList.add('border-[#7C5544]', 'text-[#7C5544]');
-        tabPedidos.classList.remove('border-transparent', 'text-gray-400');
-        tabInventario.classList.remove('border-[#7C5544]', 'text-[#7C5544]');
-        tabInventario.classList.add('border-transparent', 'text-gray-400');
-    } else {
-        vistaPedidos.classList.add('hidden');
-        vistaInventario.classList.remove('hidden');
-        tabInventario.classList.add('border-[#7C5544]', 'text-[#7C5544]');
-        tabInventario.classList.remove('border-transparent', 'text-gray-400');
-        tabPedidos.classList.remove('border-[#7C5544]', 'text-[#7C5544]');
-        tabPedidos.classList.add('border-transparent', 'text-gray-400');
+    Object.keys(vistas).forEach(clave => {
+        const activa = clave === vista;
+        vistas[clave].seccion.classList.toggle('hidden', !activa);
+        vistas[clave].tab.classList.toggle('border-[#7C5544]', activa);
+        vistas[clave].tab.classList.toggle('text-[#7C5544]', activa);
+        vistas[clave].tab.classList.toggle('border-transparent', !activa);
+        vistas[clave].tab.classList.toggle('text-gray-400', !activa);
+    });
+}
+
+// --- MODERACIÓN DE RESEÑAS ---
+let resenasGlobales = [];
+let filtroResenaActual = 'pendiente';
+
+async function cargarResenasAdmin() {
+    const { data: resenas, error } = await clienteSupabase
+        .from('resenas')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error al cargar reseñas:", error);
+        return;
+    }
+
+    resenasGlobales = resenas || [];
+    actualizarBadgeResenas();
+    renderizarResenasAdmin();
+}
+
+function actualizarBadgeResenas() {
+    const pendientes = resenasGlobales.filter(r => !r.aprobada).length;
+    const badge = document.getElementById('badge-resenas-pendientes');
+    if (badge) {
+        badge.innerText = pendientes;
+        badge.classList.toggle('hidden', pendientes === 0);
     }
 }
 
+function generarEstrellasAdmin(calificacion) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        html += `<span class="material-symbols-outlined text-sm ${i <= calificacion ? 'text-[#7C5544]' : 'text-gray-200'}" style="font-variation-settings: 'FILL' ${i <= calificacion ? 1 : 0};">star</span>`;
+    }
+    return html;
+}
+
+function renderizarResenasAdmin() {
+    const lista = document.getElementById('lista-resenas-admin');
+    if (!lista) return;
+
+    let resenasFiltradas;
+    if (filtroResenaActual === 'pendiente') {
+        resenasFiltradas = resenasGlobales.filter(r => !r.aprobada);
+    } else if (filtroResenaActual === 'aprobada') {
+        resenasFiltradas = resenasGlobales.filter(r => r.aprobada);
+    } else {
+        resenasFiltradas = resenasGlobales;
+    }
+
+    if (resenasFiltradas.length === 0) {
+        lista.innerHTML = `<p class="text-center text-gray-400 py-10 text-sm">No hay reseñas en esta categoría.</p>`;
+        return;
+    }
+
+    lista.innerHTML = resenasFiltradas.map(r => {
+        const fecha = new Date(r.created_at).toLocaleString('es-MX', {
+            day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        return `
+        <div class="bg-white p-6 rounded-2xl border border-[#EFEFD7]/50 shadow-[0_4px_20px_rgba(27,29,14,0.02)]">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <p class="font-bold text-[#1B1D0E]">${escapeHTML(r.nombre_cliente)}</p>
+                        ${r.compra_verificada ? `<span class="flex items-center gap-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full"><span class="material-symbols-outlined text-[12px]">verified</span>Compra verificada</span>` : ''}
+                        ${r.aprobada ? `<span class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Aprobada</span>` : `<span class="bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Pendiente</span>`}
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="flex">${generarEstrellasAdmin(r.calificacion)}</div>
+                        <span class="text-xs text-gray-400">${fecha}</span>
+                    </div>
+                </div>
+            </div>
+            ${r.comentario ? `<p class="text-sm text-gray-600 mb-4">${escapeHTML(r.comentario)}</p>` : ''}
+            <div class="flex gap-2">
+                ${!r.aprobada ? `<button onclick="aprobarResena(${r.id})" class="bg-[#7C5544] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#603E30] transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-sm">check</span>Aprobar</button>` : ''}
+                <button onclick="rechazarResena(${r.id})" class="bg-white border border-gray-200 text-gray-500 text-xs font-bold px-4 py-2 rounded-lg hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-sm">delete</span>${r.aprobada ? 'Quitar' : 'Rechazar'}</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+window.filtrarResenas = function(estado) {
+    filtroResenaActual = estado;
+    document.querySelectorAll('.filtro-resena').forEach(btn => {
+        const activo = btn.dataset.estado === estado;
+        btn.classList.toggle('bg-[#1B1D0E]', activo);
+        btn.classList.toggle('text-white', activo);
+        btn.classList.toggle('bg-white', !activo);
+        btn.classList.toggle('border', !activo);
+        btn.classList.toggle('border-gray-200', !activo);
+        btn.classList.toggle('text-gray-500', !activo);
+    });
+    renderizarResenasAdmin();
+}
+
+window.aprobarResena = async function(id) {
+    const { error } = await clienteSupabase
+        .from('resenas')
+        .update({ aprobada: true })
+        .eq('id', id);
+
+    if (error) {
+        alert("No se pudo aprobar la reseña. Revisa la consola.");
+        console.error(error);
+        return;
+    }
+    cargarResenasAdmin();
+}
+
+window.rechazarResena = async function(id) {
+    if (!confirm("¿Seguro que quieres eliminar esta reseña? Esta acción no se puede deshacer.")) return;
+
+    const { error } = await clienteSupabase
+        .from('resenas')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        alert("No se pudo eliminar la reseña. Revisa la consola.");
+        console.error(error);
+        return;
+    }
+    cargarResenasAdmin();
+}
 
 // Inicializar la carga al abrir el panel
 cargarCategorias();
 cargarInventario();
 cargarPedidos();
+cargarResenasAdmin();
 
 // --- ALERTA DE STOCK BAJO ---
 const UMBRAL_STOCK_BAJO = 3;
@@ -743,4 +911,66 @@ function revisarStockBajo(productos) {
 
     mensaje.innerHTML = partes.join(' &nbsp;·&nbsp; ');
     contenedor.classList.remove('hidden');
+}
+
+// --- PEDIDOS EN TIEMPO REAL ---
+
+function reproducirSonidoNotificacion() {
+    try {
+        const contexto = new (window.AudioContext || window.webkitAudioContext)();
+        const oscilador = contexto.createOscillator();
+        const volumen = contexto.createGain();
+        oscilador.connect(volumen);
+        volumen.connect(contexto.destination);
+        oscilador.type = 'sine';
+        oscilador.frequency.setValueAtTime(880, contexto.currentTime);
+        volumen.gain.setValueAtTime(0.15, contexto.currentTime);
+        volumen.gain.exponentialRampToValueAtTime(0.001, contexto.currentTime + 0.4);
+        oscilador.start();
+        oscilador.stop(contexto.currentTime + 0.4);
+    } catch (e) {
+        console.warn("No se pudo reproducir el sonido de notificación:", e);
+    }
+}
+
+function mostrarToastNuevoPedido(pedido) {
+    const toast = document.getElementById('toast-nuevo-pedido');
+    const mensaje = document.getElementById('toast-mensaje');
+    if (!toast || !mensaje) return;
+
+    const nombre = pedido.cliente_nombre || 'Cliente';
+    mensaje.innerText = `Pedido #${pedido.id} de ${nombre} — $${Number(pedido.total).toFixed(2)} MXN`;
+
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 6000);
+}
+
+clienteSupabase
+    .channel('pedidos-realtime')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedidos' }, (payload) => {
+        reproducirSonidoNotificacion();
+        mostrarToastNuevoPedido(payload.new);
+        cargarPedidos();
+    })
+    .subscribe();
+
+    window.actualizarFechaEntrega = async function(id, fecha) {
+    const { error } = await clienteSupabase
+        .from('pedidos')
+        .update({ fecha_entrega_estimada: fecha || null })
+        .eq('id', id);
+
+    if (error) {
+        alert("No se pudo guardar la fecha. Revisa la consola.");
+        console.error(error);
+        return;
+    }
+    cargarPedidos();
+}
+
+// --- HISTORIAL SIMPLIFICADO POR CLIENTA ---
+function calcularHistorialCliente(telefono) {
+    if (!telefono) return null;
+    const pedidosDeEstaClienta = pedidosGlobales.filter(p => p.cliente_telefono === telefono);
+    return pedidosDeEstaClienta.length;
 }
