@@ -156,9 +156,24 @@
         </div>
 
         <section id="vista-pedidos" class="hidden">
-            <div class="relative mb-4">
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
-                <input type="text" id="buscador-pedidos" onkeyup="filtrarPedidosPorTexto()" placeholder="Buscar por cliente, producto o # de pedido..." class="w-full p-3.5 pl-11 border border-gray-100 rounded-xl focus:outline-none focus:border-[#7C5544] bg-[#FAF9F5] text-sm transition-colors">
+            <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                <div class="relative flex-grow">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
+                    <input type="text" id="buscador-pedidos" onkeyup="filtrarPedidosPorTexto()" placeholder="Buscar por cliente, producto o # de pedido..." class="w-full p-3.5 pl-11 border border-gray-100 rounded-xl focus:outline-none focus:border-[#7C5544] bg-[#FAF9F5] text-sm transition-colors">
+                </div>
+                <select id="filtro-origen" aria-label="Filtrar por canal" onchange="filtrarPedidosPorTexto()" class="p-3.5 border border-gray-100 rounded-xl focus:outline-none focus:border-[#7C5544] bg-[#FAF9F5] text-sm">
+                    <option value="">Todos los canales</option>
+                    <option value="web">Sitio web</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="whatsapp">WhatsApp directo</option>
+                    <option value="en_persona">En persona</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <button onclick="abrirModalNuevoPedido()" class="flex items-center justify-center gap-1.5 px-5 py-3.5 rounded-xl text-sm font-bold bg-[#7C5544] text-white hover:bg-[#603E30] transition-colors whitespace-nowrap">
+                    <span class="material-symbols-outlined text-lg">add</span>
+                    Nuevo pedido
+                </button>
             </div>
             <div class="flex flex-wrap gap-2 mb-6">
                 <button onclick="filtrarPedidos('esta-semana')" data-estado="esta-semana" class="filtro-pedido px-4 py-2 rounded-full text-xs font-bold bg-white border border-gray-200 text-gray-500 transition-colors flex items-center gap-1">
@@ -183,6 +198,71 @@
         </section>
 
     </main>
+
+    <div id="modal-nuevo-pedido" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-[#1B1D0E]/40 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center p-6 border-b border-gray-100 sticky top-0 bg-white">
+                <h2 class="font-bold text-lg text-[#1B1D0E]">Nuevo pedido manual</h2>
+                <button onclick="cerrarModalNuevoPedido()" class="text-gray-400 hover:text-[#7C5544]" aria-label="Cerrar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="p-6 flex flex-col gap-4">
+                <p class="text-xs text-gray-400 -mt-2">Para pedidos que llegaron por redes sociales, WhatsApp directo o en persona — así quedan en el mismo control que los del sitio.</p>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="manual-cliente-nombre" class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Nombre de la clienta</label>
+                        <input type="text" id="manual-cliente-nombre" placeholder="Ej. María" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#7C5544]">
+                    </div>
+                    <div>
+                        <label for="manual-cliente-telefono" class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Teléfono</label>
+                        <input type="tel" id="manual-cliente-telefono" placeholder="Ej. 8711234567" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#7C5544]">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="manual-origen" class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">¿De dónde vino este pedido?</label>
+                    <select id="manual-origen" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#7C5544]">
+                        <option value="instagram">Instagram</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="whatsapp">WhatsApp directo</option>
+                        <option value="en_persona">En persona</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Productos</label>
+                    <div id="manual-lista-productos" class="flex flex-col gap-2 max-h-56 overflow-y-auto border border-gray-100 rounded-xl p-3"></div>
+                </div>
+
+                <div class="flex justify-between items-center bg-[#FAF9F5] rounded-xl p-4">
+                    <span class="font-bold text-sm text-[#1B1D0E]">Total</span>
+                    <span id="manual-total" class="font-bold text-xl text-[#7C5544]">$0.00 MXN</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="manual-estado" class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Estado inicial</label>
+                        <select id="manual-estado" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#7C5544]">
+                            <option value="pendiente">Pendiente</option>
+                            <option value="confirmado">Confirmado (descuenta stock ya)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="manual-fecha-entrega" class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Entrega estimada (opcional)</label>
+                        <input type="date" id="manual-fecha-entrega" class="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#7C5544]">
+                    </div>
+                </div>
+
+                <button onclick="guardarPedidoManual()" class="w-full bg-[#7C5544] text-white font-bold py-3.5 rounded-full hover:bg-[#603E30] transition-colors mt-2">
+                    Guardar pedido
+                </button>
+                <p id="manual-mensaje" class="text-xs font-medium text-center hidden"></p>
+            </div>
+        </div>
+    </div>
 
     <div id="modal-edicion" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-[#1B1D0E]/40 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] p-8 max-h-[90vh] overflow-y-auto m-4 border border-gray-100 transform scale-95 transition-transform duration-300">

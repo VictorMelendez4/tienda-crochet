@@ -549,6 +549,15 @@ const ESTILOS_ESTADO = {
     cancelado:  'bg-red-50 text-red-600 border-red-200'
 };
 
+const ETIQUETAS_ORIGEN = {
+    web:        { etiqueta: 'Sitio web',       icono: 'language',      clase: 'bg-gray-100 text-gray-600' },
+    instagram:  { etiqueta: 'Instagram',       icono: 'photo_camera',  clase: 'bg-pink-50 text-pink-600' },
+    facebook:   { etiqueta: 'Facebook',        icono: 'thumb_up',      clase: 'bg-blue-50 text-blue-600' },
+    whatsapp:   { etiqueta: 'WhatsApp',        icono: 'chat',          clase: 'bg-green-50 text-green-600' },
+    en_persona: { etiqueta: 'En persona',      icono: 'handshake',     clase: 'bg-orange-50 text-orange-600' },
+    otro:       { etiqueta: 'Otro',            icono: 'more_horiz',    clase: 'bg-gray-100 text-gray-600' }
+};
+
 async function cargarPedidos() {
     const { data: pedidos, error } = await clienteSupabase
         .from('pedidos')
@@ -606,6 +615,12 @@ function renderizarPedidos() {
         });
     }
 
+    const selectOrigen = document.getElementById('filtro-origen');
+    const origenSeleccionado = selectOrigen ? selectOrigen.value : '';
+    if (origenSeleccionado) {
+        pedidosFiltrados = pedidosFiltrados.filter(p => (p.origen || 'web') === origenSeleccionado);
+    }
+
     if (pedidosFiltrados.length === 0) {
         lista.innerHTML = `<p class="text-center text-gray-400 py-10 text-sm">No hay pedidos que coincidan con tu búsqueda.</p>`;
         return;
@@ -640,7 +655,13 @@ function renderizarPedidos() {
                         return '';
                     })()}</p>` : ''}
                 </div>
-                <span class="text-xs font-bold px-3 py-1 rounded-full border ${estiloBadge} capitalize">${pedido.estado}</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-3 py-1 rounded-full border ${estiloBadge} capitalize">${pedido.estado}</span>
+                    ${(() => {
+                        const origenInfo = ETIQUETAS_ORIGEN[pedido.origen || 'web'] || ETIQUETAS_ORIGEN.otro;
+                        return `<span class="text-xs font-bold px-3 py-1 rounded-full ${origenInfo.clase} flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">${origenInfo.icono}</span>${origenInfo.etiqueta}</span>`;
+                    })()}
+                </div>
             </div>
 
             ${pedido.estado === 'confirmado' ? (() => {
@@ -973,4 +994,137 @@ function calcularHistorialCliente(telefono) {
     if (!telefono) return null;
     const pedidosDeEstaClienta = pedidosGlobales.filter(p => p.cliente_telefono === telefono);
     return pedidosDeEstaClienta.length;
+}
+// --- PEDIDO MANUAL (ventas fuera del sitio: redes sociales, WhatsApp directo, en persona) ---
+let carritoManual = [];
+
+window.abrirModalNuevoPedido = function() {
+    carritoManual = [];
+    document.getElementById('manual-cliente-nombre').value = '';
+    document.getElementById('manual-cliente-telefono').value = '';
+    document.getElementById('manual-origen').value = 'instagram';
+    document.getElementById('manual-estado').value = 'pendiente';
+    document.getElementById('manual-fecha-entrega').value = '';
+    document.getElementById('manual-mensaje').classList.add('hidden');
+    renderizarListaProductosManual();
+    actualizarTotalManual();
+    document.getElementById('modal-nuevo-pedido').classList.remove('hidden');
+}
+
+window.cerrarModalNuevoPedido = function() {
+    document.getElementById('modal-nuevo-pedido').classList.add('hidden');
+}
+
+function renderizarListaProductosManual() {
+    const contenedor = document.getElementById('manual-lista-productos');
+    if (!contenedor) return;
+
+    if (!productosGlobales || productosGlobales.length === 0) {
+        contenedor.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">No hay productos en tu inventario todavía.</p>`;
+        return;
+    }
+
+    contenedor.innerHTML = productosGlobales.map(prod => {
+        const enCarrito = carritoManual.find(item => item.id === prod.id);
+        const cantidad = enCarrito ? enCarrito.cantidad : 0;
+        return `
+        <div class="flex items-center justify-between gap-3 py-2 border-b border-gray-50 last:border-b-0">
+            <div class="min-w-0">
+                <p class="text-sm font-semibold text-[#1B1D0E] truncate">${escapeHTML(prod.nombre)}</p>
+                <p class="text-xs text-gray-400">$${Number(prod.precio).toFixed(2)} MXN · Stock: ${prod.stock ?? 0}</p>
+            </div>
+            <div class="flex items-center gap-1 bg-[#FAF9F5] rounded-full px-1 shrink-0">
+                <button type="button" onclick="cambiarCantidadManual(${prod.id}, -1)" class="w-7 h-7 flex items-center justify-center hover:bg-white rounded-full text-sm font-bold">-</button>
+                <span class="text-sm font-bold w-6 text-center">${cantidad}</span>
+                <button type="button" onclick="cambiarCantidadManual(${prod.id}, 1)" class="w-7 h-7 flex items-center justify-center hover:bg-white rounded-full text-sm font-bold">+</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+window.cambiarCantidadManual = function(productoId, delta) {
+    const producto = productosGlobales.find(p => p.id === productoId);
+    if (!producto) return;
+
+    let item = carritoManual.find(i => i.id === productoId);
+    if (!item) {
+        if (delta < 0) return;
+        item = { id: producto.id, nombre: producto.nombre, precio: producto.precio, cantidad: 0 };
+        carritoManual.push(item);
+    }
+
+    item.cantidad += delta;
+    if (item.cantidad <= 0) {
+        carritoManual = carritoManual.filter(i => i.id !== productoId);
+    }
+
+    renderizarListaProductosManual();
+    actualizarTotalManual();
+}
+
+function actualizarTotalManual() {
+    const total = carritoManual.reduce((suma, item) => suma + (item.precio * item.cantidad), 0);
+    const totalEl = document.getElementById('manual-total');
+    if (totalEl) totalEl.innerText = `$${total.toFixed(2)} MXN`;
+}
+
+window.guardarPedidoManual = async function() {
+    const nombre = document.getElementById('manual-cliente-nombre').value.trim();
+    const telefono = document.getElementById('manual-cliente-telefono').value.trim();
+    const origen = document.getElementById('manual-origen').value;
+    const estado = document.getElementById('manual-estado').value;
+    const fechaEntrega = document.getElementById('manual-fecha-entrega').value;
+    const mensaje = document.getElementById('manual-mensaje');
+
+    if (!nombre) {
+        mensaje.innerText = 'Por favor pon el nombre de la clienta.';
+        mensaje.className = 'text-xs font-medium text-center text-red-500';
+        mensaje.classList.remove('hidden');
+        return;
+    }
+    if (carritoManual.length === 0) {
+        mensaje.innerText = 'Agrega al menos un producto al pedido.';
+        mensaje.className = 'text-xs font-medium text-center text-red-500';
+        mensaje.classList.remove('hidden');
+        return;
+    }
+
+    const total = carritoManual.reduce((suma, item) => suma + (item.precio * item.cantidad), 0);
+
+    const datosPedido = {
+        items: carritoManual,
+        total: total,
+        estado: estado,
+        cliente_nombre: nombre,
+        cliente_telefono: telefono || null,
+        origen: origen,
+        fecha_entrega_estimada: fechaEntrega || null,
+        stock_descontado: false
+    };
+
+    // Si se crea ya como "confirmado", descontamos stock de una vez (mismo mecanismo que el resto del sistema)
+    if (estado === 'confirmado') {
+        for (const item of carritoManual) {
+            const { error: errorStock } = await clienteSupabase.rpc('decrementar_stock', {
+                p_producto_id: item.id,
+                p_cantidad: item.cantidad
+            });
+            if (errorStock) console.error(`Error descontando stock de ${item.nombre}:`, errorStock);
+        }
+        datosPedido.stock_descontado = true;
+    }
+
+    const { error } = await clienteSupabase.from('pedidos').insert([datosPedido]);
+
+    if (error) {
+        console.error("Error al guardar pedido manual:", error);
+        mensaje.innerText = 'Hubo un problema al guardar el pedido. Revisa la consola.';
+        mensaje.className = 'text-xs font-medium text-center text-red-500';
+        mensaje.classList.remove('hidden');
+        return;
+    }
+
+    cerrarModalNuevoPedido();
+    cargarPedidos();
+    cargarInventario();
 }
