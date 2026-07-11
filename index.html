@@ -47,26 +47,23 @@
     </style>
 </head>
 <body class="font-body-md text-on-surface antialiased pb-24 md:pb-0">
-    <header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-md shadow-sm">
-        <div class="flex justify-between items-center px-container-margin py-4 w-full max-w-7xl mx-auto">
+    <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
             <div class="flex items-center gap-6">
                 <button class="md:hidden text-on-surface-variant hover:opacity-80 transition-opacity">
-                    <span class="material-symbols-outlined" data-icon="menu">menu</span>
+                    <span class="material-symbols-outlined">menu</span>
                 </button>
-                <a class="font-display text-headline-lg font-bold text-primary" href="#">Crochet Catalog</a>
+                <a class="font-display text-2xl font-bold text-primary" href="#">Crochet Catalog</a>
             </div>
-            <nav class="hidden md:flex gap-8 items-center font-label-lg text-label-lg">
-                <a class="text-primary border-b-2 border-primary pb-1 squish-click" href="#">Home</a>
-                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click" href="#catalogo">Browse</a>
-                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click" href="custom-orders.html">Custom Orders</a>
-                <a class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click" href="about.html">About</a>
-                <a class="text-on-surface-variant hover:text-primary transition-colors" href="faq.html">FAQ</a>
+            <nav class="hidden md:flex gap-8 items-center text-sm font-medium">
+                <a class="text-primary border-b-2 border-primary pb-1" href="#">Inicio</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#catalogo">Catálogo</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="custom-orders.html">Pedidos Personalizados</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="about.html">Nosotros</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="faq.html">Preguntas</a>
             </nav>
             <div class="flex items-center gap-4">
-                <button class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click">
-                    <span class="material-symbols-outlined" data-icon="search">search</span>
-                </button>
-                <button onclick="abrirCarritoDrawer()" class="text-on-surface-variant hover:opacity-80 transition-opacity squish-click flex items-center" aria-label="Ver carrito">
+                <button onclick="abrirCarritoDrawer()" class="text-on-surface-variant hover:opacity-80 transition-opacity flex items-center" aria-label="Ver carrito">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
                     <span id="contador-carrito" class="ml-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
                 </button>
@@ -80,9 +77,9 @@
                 <div class="w-full h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1628148810757-0a9f5dceafbc?q=80&w=2000&auto=format&fit=crop');"></div>
                 <div class="absolute inset-0 bg-gradient-to-r from-[#fbfbe2]/95 via-[#fbfbe2]/70 to-transparent flex items-center">
                     <div class="max-w-xl pl-8 md:pl-16">
-                        <h1 class="font-display text-[40px] leading-tight font-bold text-primary mb-stack-sm">Handcrafted Companions</h1>
-                        <p class="font-body-lg text-lg text-on-surface-variant mb-stack-lg max-w-md">Bring home a touch of warmth with our artisanal amigurumi plushies, stitched with love and high-quality yarn.</p>
-                        <button onclick="document.getElementById('catalogo').scrollIntoView()" class="bg-primary text-on-primary font-label-lg font-bold px-8 py-3.5 rounded-full soft-shadow hover:opacity-90 squish-click transition-all">Shop Now</button>
+                        <h1 class="font-display text-[40px] leading-tight font-bold text-primary mb-stack-sm">Compañeros Hechos a Mano</h1>
+                        <p class="font-body-lg text-lg text-on-surface-variant mb-stack-lg max-w-md">Lleva a casa un toque de calidez con nuestros amigurumis artesanales, tejidos con amor y estambre de alta calidad.</p>
+                        <button onclick="document.getElementById('catalogo').scrollIntoView()" class="bg-primary text-on-primary font-label-lg font-bold px-8 py-3.5 rounded-full soft-shadow hover:opacity-90 squish-click transition-all">Comprar Ahora</button>
                     </div>
                 </div>
             </div>
@@ -90,7 +87,7 @@
 
         <section id="catalogo" class="mb-section-gap scroll-mt-28">
             <div class="flex justify-between items-end mb-stack-md">
-                <h2 class="font-headline-lg text-2xl font-bold text-on-surface">New Arrivals</h2>
+                <h2 class="font-headline-lg text-2xl font-bold text-on-surface">Novedades</h2>
             </div>
 
 

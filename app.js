@@ -61,7 +61,7 @@ function renderizarProductos(productos) {
                     
                     <button onclick="agregarAlCarrito(${prod.id})" class="w-full bg-primary text-on-primary font-label-lg text-sm px-4 py-2.5 rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2 squish-click shadow-sm">
                         <span class="material-symbols-outlined text-base">shopping_bag</span>
-                        Add to Cart
+                        Agregar al Carrito
                     </button>
                 </div>
             </div>
