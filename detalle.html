@@ -23,17 +23,17 @@
     <header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-md shadow-sm">
         <div class="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
             <div class="flex items-center gap-6">
-                <button class="md:hidden text-on-surface-variant hover:opacity-80 transition-opacity">
+                <button onclick="toggleMenuMovil()" id="btn-menu-movil" aria-expanded="false" aria-label="Abrir menú" class="md:hidden text-on-surface-variant hover:opacity-80 transition-opacity">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
                 <a class="font-display text-2xl font-bold text-primary" href="index.html">Crochet Catalog</a>
             </div>
             <nav class="hidden md:flex gap-8 items-center text-sm font-medium">
-                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html">Home</a>
-                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html#catalogo">Browse</a>
-                <a class="text-on-surface-variant hover:text-primary transition-colors" href="custom-orders.html">Custom Orders</a>
-                <a class="text-on-surface-variant hover:text-primary transition-colors" href="about.html">About</a>
-                <a class="text-on-surface-variant hover:text-primary transition-colors" href="faq.html">FAQ</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html">Inicio</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="index.html#catalogo">Catálogo</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="custom-orders.html">Pedidos Personalizados</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="about.html">Nosotros</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="faq.html">Preguntas</a>
             </nav>
             <div class="flex items-center gap-4">
                 <button onclick="abrirCarritoDrawer()" class="text-on-surface-variant hover:opacity-80 transition-opacity flex items-center" aria-label="Ver carrito">
@@ -43,6 +43,16 @@
             </div>
         </div>
     </header>
+
+    <div id="menu-movil" class="hidden md:hidden fixed top-[73px] left-0 right-0 bg-surface border-b border-outline-variant/30 shadow-lg z-40">
+        <nav class="flex flex-col p-3 gap-1">
+                <a href="#" onclick="toggleMenuMovil()" class="block px-4 py-3 rounded-xl text-primary bg-primary/5 font-semibold transition-colors">Inicio</a>
+                <a href="#catalogo" onclick="toggleMenuMovil()" class="block px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-lowest hover:text-primary font-medium transition-colors">Catálogo</a>
+                <a href="custom-orders.html" onclick="toggleMenuMovil()" class="block px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-lowest hover:text-primary font-medium transition-colors">Pedidos Personalizados</a>
+                <a href="about.html" onclick="toggleMenuMovil()" class="block px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-lowest hover:text-primary font-medium transition-colors">Nosotros</a>
+                <a href="faq.html" onclick="toggleMenuMovil()" class="block px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-lowest hover:text-primary font-medium transition-colors">Preguntas</a>
+        </nav>
+    </div>
 
     <main class="max-w-[1200px] mx-auto px-6 pt-28 pb-16">
         <nav class="flex items-center gap-2 text-sm font-medium text-on-surface-variant mb-8">
@@ -84,11 +94,11 @@
                 </div>
 
                 <button id="btn-add-cart" class="group w-full max-w-[340px] bg-primary text-on-primary py-4 rounded-full font-bold text-base shadow-lg hover:opacity-90 transition-all duration-300 flex items-center justify-center gap-2 squish-click">
-                    <span>Add to Cart</span>
+                    <span>Agregar al Carrito</span>
                     <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">shopping_bag</span>
                 </button>
 
-                <div class="flex items-center gap-6 mt-8 pt-6 border-t border-outline-variant/40 text-xs text-on-surface-variant">
+                <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mt-8 pt-6 border-t border-outline-variant/40 text-xs text-on-surface-variant">
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary text-lg">volunteer_activism</span>
                         Tejido a mano

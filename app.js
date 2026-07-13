@@ -220,3 +220,13 @@ window.eliminarDelDrawer = function(index) {
 document.addEventListener('keydown', (evento) => {
     if (evento.key === 'Escape') cerrarCarritoDrawer();
 });
+
+// --- MENÚ MÓVIL ---
+window.toggleMenuMovil = function() {
+    const menu = document.getElementById('menu-movil');
+    const btn = document.getElementById('btn-menu-movil');
+    const estaAbierto = !menu.classList.contains('hidden');
+    menu.classList.toggle('hidden');
+    btn.setAttribute('aria-expanded', String(!estaAbierto));
+    btn.querySelector('span').innerText = estaAbierto ? 'menu' : 'close';
+}

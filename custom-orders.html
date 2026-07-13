@@ -24,7 +24,7 @@
     <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-sm">
         <div class="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
             <div class="flex items-center gap-6">
-                <button class="md:hidden text-on-surface-variant hover:opacity-80 transition-opacity">
+                <button onclick="toggleMenuMovil()" id="btn-menu-movil" aria-expanded="false" aria-label="Abrir menú" class="md:hidden text-on-surface-variant hover:opacity-80 transition-opacity">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
                 <a class="font-display text-2xl font-bold text-primary" href="index.html">Crochet Catalog</a>
@@ -44,6 +44,16 @@
             </div>
         </div>
     </header>
+
+    <div id="menu-movil" class="hidden md:hidden fixed top-[73px] left-0 right-0 bg-surface border-b border-outline-variant/30 shadow-lg z-40">
+        <nav class="flex flex-col p-3 gap-1">
+                <a href="#" onclick="toggleMenuMovil()" class="block px-4 py-3 rounded-xl text-primary bg-primary/5 font-semibold transition-colors">Inicio</a>
+                <a href="#catalogo" onclick="toggleMenuMovil()" class="block px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-lowest hover:text-primary font-medium transition-colors">Catálogo</a>
+                <a href="custom-orders.html" onclick="toggleMenuMovil()" class="block px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-lowest hover:text-primary font-medium transition-colors">Pedidos Personalizados</a>
+                <a href="about.html" onclick="toggleMenuMovil()" class="block px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-lowest hover:text-primary font-medium transition-colors">Nosotros</a>
+                <a href="faq.html" onclick="toggleMenuMovil()" class="block px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-lowest hover:text-primary font-medium transition-colors">Preguntas</a>
+        </nav>
+    </div>
 
     <main>
         <!-- HERO: mismo respiro generoso que en about.html -->
@@ -113,6 +123,15 @@
     </main>
 
     <script>
+        function toggleMenuMovil() {
+            const menu = document.getElementById('menu-movil');
+            const btn = document.getElementById('btn-menu-movil');
+            const estaAbierto = !menu.classList.contains('hidden');
+            menu.classList.toggle('hidden');
+            btn.setAttribute('aria-expanded', String(!estaAbierto));
+            btn.querySelector('span').innerText = estaAbierto ? 'menu' : 'close';
+        }
+
         function actualizarContadorCarritoHeader() {
             const carrito = JSON.parse(localStorage.getItem('carrito-crochet')) || [];
             const totalItems = carrito.reduce((total, item) => total + (item.cantidad || 1), 0);
